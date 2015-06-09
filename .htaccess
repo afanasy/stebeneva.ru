@@ -1,0 +1,4 @@
+RewriteEngine On
+RewriteRule ^$ /index.php
+RewriteRule ^(contact|admin)$ /$1.php
+RewriteRule ^photo/(studio|portrait|reportage|models|travel)$ /photo.php?s=$1

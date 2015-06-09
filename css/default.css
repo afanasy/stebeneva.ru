@@ -1,0 +1,22 @@
+@font-face {
+	font-family: 'Futuris';
+	src: url('fonts/futuris.eot');
+	src: local('☺'), url('fonts/futuris.svg') format('svg'), url('fonts/futuris.eot') format('embedded-opentype'), url('fonts/futuris.woff') format('woff'), url('fonts/futuris.ttf') format('truetype');
+	font-weight: normal;
+	font-style: normal;
+}
+
+body {
+  margin: 0px;
+  padding :0px;
+  background: #fff;
+  font-family: 'Futuris', Helvetica;
+  font-size: 15px;
+  color: #3a3838;
+  -webkit-font-smoothing: antialiased;
+  text-shadow: 0px 0px 1px rgba(0,0,0,.01);
+}
+
+img {
+  border: 0px;
+}

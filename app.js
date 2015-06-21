@@ -1,0 +1,242 @@
+
+/**
+ * Module dependencies.
+ */
+
+var express = require('express');
+var http = require('http');
+var path = require('path');
+var basicAuth = require('basic-auth');
+var multer = require('multer');
+var uniqid = require('uniqid');
+var fs = require('fs');
+var Promise = require('bluebird');
+var gd = require('node-gd');
+var gm = Promise.promisifyAll(require('gm'));
+
+var routes = require('./routes');
+var conf = require('./conf');
+var authConf = require('./config');
+var app = express();
+
+// attach conf
+app.use(function (req, res, next) {
+  var configPath;
+  if ('local' == app.get('env')) configPath = 'a';
+
+  conf(configPath)
+    .then(function (json) {
+      app.locals.conf = json;
+      app.locals.ucfirst = function(value){
+          return value.charAt(0).toUpperCase() + value.slice(1);
+      };
+      return next();
+    });
+});
+
+// all environments
+app.set('port', process.env.PORT || 3000);
+app.set('views', path.join(__dirname, 'views'));
+app.set('view engine', 'jade');
+app.use(express.favicon());
+app.use(express.logger('dev'));
+app.use(express.json());
+app.use(express.urlencoded());
+app.use(express.methodOverride());
+app.use(app.router);
+app.use(express.static(path.join(__dirname, 'public')));
+
+// local only
+if ('local' == app.get('env')) {
+  app.use(express.errorHandler());
+}
+
+app.get('/', routes.index);
+app.get('/photo/:section', routes.photo);
+app.get('/contact', routes.contact);
+
+var handleUploadMiddleware = handleUpload();
+app.all('/admin', authBasic, handleUploadMiddleware, routes.admin);
+
+http.createServer(app).listen(app.get('port'), function(){
+  console.log('Express server listening on port ' + app.get('port'));
+});
+
+
+function authBasic(req, res, next) {
+  function unauthorized(res) {
+    res.set('WWW-Authenticate', 'Basic realm=Authorization Required');
+    return res.send(401);
+  };
+
+  var user = basicAuth(req);
+
+  if (!user || !user.name || !user.pass) {
+    return unauthorized(res);
+  };
+
+  if (user.name === authConf.auth.username && user.pass === authConf.auth.password) {
+    return next();
+  } else {
+    return unauthorized(res);
+  };
+};
+
+function handleUpload(argument) {
+  return multer({
+    dest: './uploads/',
+    onFileUploadComplete: function (file, req, res) {
+      saveGD(file, req.body.section)
+        .then(function (json) {
+          res.end(json);
+        })
+        .catch(function (err) {
+          console.log(err);
+          res.end(500);
+        });
+    }
+  });
+}
+
+function saveGD(file, section) {
+  var thumbWidth = 56;
+  var thumbHeight = 56;
+  var maxWidth = 675;
+  var maxHeight = 450;
+  var name = 'auto' + uniqid() + '.jpg';
+
+  return new Promise(function(resolve, reject) {
+    gd.openFileAsync(file.path)
+      .then(function (source) {
+
+        var img = gd.creatTrueColor(100,100);
+        console.log(img);
+        var width = img.width;
+        var height = img.height;
+        if (!widht || !height) {
+          return reject(new Error('File size error!' + width + height));
+        }
+        var thumb = gd.creatTrueColor(thumbWidth, thumbHeight);
+
+
+        var ratioWidth = width / maxWidth;
+        var ratioHeight = height / maxHeight;
+
+        // if size exceed max
+        if((ratioWidth > 1) || (ratioHeight > 1)) {
+
+          // get max ratio
+          var ratio = Math.max(ratioWidth, ratioHeight);
+          var targetWidth = width / ratio;
+          var targetHeight = height / ratio;
+          var target = gd.creatTrueColor(targetWidth, targetHeight);
+
+          // gd.Image#copyResampled(dest, dx, dy, sx, sy, dw, dh, sw, sh)
+          gd.copyResampled(target, source, 0, 0, 0, 0, targetWidth, targetHeight, width, height);
+          source = target;
+          width = targetWidth;
+          height = targetHeight;
+        }
+
+        var x = 0;
+        var y = 0;
+
+        var size = Math.min(width, height);
+        var offset = Math.abs(width - height) / 2.;
+
+        if(width > height)
+          x += offset;
+        else
+          y += offset;
+
+        gd.copyResampled(thumb, source, 0, 0, x, y, thumbWidth, thumbHeight, size, size);
+        return Promise.all([
+          thumb.imageSaveAsync(path.resolve(__dirname, 'photos', section, 'thumb', name), 100),
+          source.imageSaveAsync(path.resolve(__dirname, 'photos', section, 'slides', name), 100),
+          fs.unlinkAsync(file.path)
+        ])
+        .then(function () {
+          return name;
+        });
+
+      })
+      .then(function (name) {
+        return {file: name};
+      });
+  });
+}
+
+function saveGM(file, section) {
+  var thumbWidth = 56;
+  var thumbHeight = 56;
+  var maxWidth = 675;
+  var maxHeight = 450;
+  var name = 'auto' + uniqid() + '.jpg';
+
+  return new Promise(function(resolve, reject) {
+
+    gm(file.path)
+      .size(function (err, size) {
+        if (err) {
+          return reject(err);
+        }
+
+        var width = size.width;
+        var height = size.height;
+
+        if (!widht || !height) {
+          return reject(new Error('File size error!' + width + height));
+        }
+
+      })
+      .then(function (size) {
+
+        var thumb = gd.creatTrueColor(thumbWidth, thumbHeight);
+
+
+        var ratioWidth = width / maxWidth;
+        var ratioHeight = height / maxHeight;
+
+        // if size exceed max
+        if((ratioWidth > 1) || (ratioHeight > 1)) {
+
+          // get max ratio
+          var ratio = Math.max(ratioWidth, ratioHeight);
+          var targetWidth = width / ratio;
+          var targetHeight = height / ratio;
+          var target = gd.creatTrueColor(targetWidth, targetHeight);
+
+          // gd.Image#copyResampled(dest, dx, dy, sx, sy, dw, dh, sw, sh)
+          gd.copyResampled(target, source, 0, 0, 0, 0, targetWidth, targetHeight, width, height);
+          source = target;
+          width = targetWidth;
+          height = targetHeight;
+        }
+
+        var x = 0;
+        var y = 0;
+
+        var size = Math.min(width, height);
+        var offset = Math.abs(width - height) / 2.;
+
+        if(width > height)
+          x += offset;
+        else
+          y += offset;
+
+        gd.copyResampled(thumb, source, 0, 0, x, y, thumbWidth, thumbHeight, size, size);
+        return Promise.all([
+          thumb.imageSaveAsync(path.resolve(__dirname, 'photos', section, 'thumb', name), 100),
+          source.imageSaveAsync(path.resolve(__dirname, 'photos', section, 'slides', name), 100),
+          fs.unlinkAsync(file.path)
+        ])
+        .then(function () {
+          return name;
+        });
+
+      })
+      .then(function (name) {
+        return {file: name};
+      });
+  });
+}

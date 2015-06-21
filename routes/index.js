@@ -32,8 +32,6 @@ exports.admin = function (req, res, next) {
   if (req.method === 'POST') {
     // handle save action
     if (req.body.action === 'save') {
-      
-      console.log('save', req.body.conf);
 
       confModel.save(req.body.conf)
         .then(function (value) {
@@ -58,9 +56,6 @@ exports.admin = function (req, res, next) {
         .then(function () {
           res.end();
         });
-
-    } else if (req.files) {
-      return res.json(req.files);
 
     }
   }

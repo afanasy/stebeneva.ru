@@ -5,14 +5,15 @@ var fs = Promise.promisifyAll(require('fs'));
 
 function save(conf) {
   return new Promise(function(resolve, reject) {
-    if (typeof confPath === 'string')
-      confPath = JSON.parse(confPath);
-      
-    fs.writeFile(confPath, conf, function (err) {
+    if (typeof conf === 'string') {
+      conf = JSON.parse(conf);
+    }
+
+    fs.writeFile(confPath, JSON.stringify(conf, null, 2), function (err) {
       if (err) {
         return reject(err);
       }
-      return resolve();
+      return resolve(conf);
     });
 
   });

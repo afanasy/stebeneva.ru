@@ -22,7 +22,7 @@ var app = express();
 // attach conf
 app.use(function (req, res, next) {
   var configPath;
-  if ('local' == app.get('env')) configPath = 'a';
+  // if ('local' == app.get('env')) configPath = 'a';
 
   conf(configPath)
     .then(function (json) {
@@ -82,16 +82,19 @@ function authBasic(req, res, next) {
   };
 };
 
-function handleUpload(argument) {
+function handleUpload() {
   return multer({
     dest: './uploads/',
     onFileUploadComplete: function (file, req, res) {
       saveGD(file, req.body.section)
-        .then(function (json) {
-          res.end(json);
+        .then(function (file) {
+
+          res.json({
+            file: file
+          });
         })
         .catch(function (err) {
-          console.log(err);
+          console.log(err.stack);
           res.end(500);
         });
     }
@@ -106,17 +109,17 @@ function saveGD(file, section) {
   var name = 'auto' + uniqid() + '.jpg';
 
   return new Promise(function(resolve, reject) {
-    gd.openFileAsync(file.path)
-      .then(function (source) {
+    gd.openJpeg(file.path, function (err, source) {
+      if (err) {
+        return reject(err);
+      }
 
-        var img = gd.creatTrueColor(100,100);
-        console.log(img);
-        var width = img.width;
-        var height = img.height;
-        if (!widht || !height) {
-          return reject(new Error('File size error!' + width + height));
-        }
-        var thumb = gd.creatTrueColor(thumbWidth, thumbHeight);
+      var width = source.width;
+      var height = source.height;
+      if (!width || !height) {
+        return reject(new Error('File size error!' + width + height));
+      }
+        var thumb = gd.createTrueColor(thumbWidth, thumbHeight);
 
 
         var ratioWidth = width / maxWidth;
@@ -129,10 +132,10 @@ function saveGD(file, section) {
           var ratio = Math.max(ratioWidth, ratioHeight);
           var targetWidth = width / ratio;
           var targetHeight = height / ratio;
-          var target = gd.creatTrueColor(targetWidth, targetHeight);
+          var target = gd.createTrueColor(targetWidth, targetHeight);
 
           // gd.Image#copyResampled(dest, dx, dy, sx, sy, dw, dh, sw, sh)
-          gd.copyResampled(target, source, 0, 0, 0, 0, targetWidth, targetHeight, width, height);
+          target.copyResampled(source, 0, 0, 0, 0, targetWidth, targetHeight, width, height);
           source = target;
           width = targetWidth;
           height = targetHeight;
@@ -149,20 +152,31 @@ function saveGD(file, section) {
         else
           y += offset;
 
-        gd.copyResampled(thumb, source, 0, 0, x, y, thumbWidth, thumbHeight, size, size);
-        return Promise.all([
-          thumb.imageSaveAsync(path.resolve(__dirname, 'photos', section, 'thumb', name), 100),
-          source.imageSaveAsync(path.resolve(__dirname, 'photos', section, 'slides', name), 100),
-          fs.unlinkAsync(file.path)
-        ])
-        .then(function () {
-          return name;
+        x = Math.floor(x);
+        y = Math.floor(y);
+
+        source.copyResampled(thumb, 0, 0, +x, +y, thumbWidth, thumbHeight, size, size);
+        thumb.saveJpeg(path.resolve(__dirname, 'public/photos', section, 'thumbs', name), 100, function (err) {
+          if (err) {
+            return reject(err);
+          }
+          source.saveJpeg(path.resolve(__dirname, 'public/photos', section, 'slides', name), 100, function (err) {
+            if (err) {
+              return reject(err);
+            }
+            fs.unlinkAsync(file.path)
+              .then(function () {
+                return resolve(name);
+              })
+              .catch(function (err) {
+                console.error(err.stack);
+                return reject(err);
+              });
+          });
+
         });
 
       })
-      .then(function (name) {
-        return {file: name};
-      });
   });
 }
 
@@ -184,14 +198,14 @@ function saveGM(file, section) {
         var width = size.width;
         var height = size.height;
 
-        if (!widht || !height) {
+        if (!width || !height) {
           return reject(new Error('File size error!' + width + height));
         }
 
       })
       .then(function (size) {
 
-        var thumb = gd.creatTrueColor(thumbWidth, thumbHeight);
+        var thumb = gd.createTrueColor(thumbWidth, thumbHeight);
 
 
         var ratioWidth = width / maxWidth;
@@ -204,7 +218,7 @@ function saveGM(file, section) {
           var ratio = Math.max(ratioWidth, ratioHeight);
           var targetWidth = width / ratio;
           var targetHeight = height / ratio;
-          var target = gd.creatTrueColor(targetWidth, targetHeight);
+          var target = gd.createTrueColor(targetWidth, targetHeight);
 
           // gd.Image#copyResampled(dest, dx, dy, sx, sy, dw, dh, sw, sh)
           gd.copyResampled(target, source, 0, 0, 0, 0, targetWidth, targetHeight, width, height);

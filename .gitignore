@@ -25,3 +25,4 @@ build/Release
 node_modules
 uploads/*jpg
 public/photos/conf.json
+public/photos/**/*.jpg

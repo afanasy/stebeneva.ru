@@ -38,6 +38,9 @@ function init(file) {
     var folderPath = path.resolve(__dirname, 'public/photos', folder, 'slides');
     return fs.readdirAsync(folderPath)
       .then(function (files) {
+        files = files.filter(function (file) {
+          return /jpg$/.test(file);
+        });
         return {
           folder: folder,
           files: files,

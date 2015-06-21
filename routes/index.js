@@ -41,7 +41,6 @@ exports.admin = function (req, res, next) {
         });
 
     } else if (req.body.action === 'delete') {
-      confModel.save('delete', req.body.file);
 
       var file = path.basename(req.body.file);
       var section = req.body.section;
@@ -54,6 +53,9 @@ exports.admin = function (req, res, next) {
       // yes, delete it
       return photos.delete(section, file)
         .then(function () {
+          return confModel.delete(section, file);
+        })
+        .then(function () {
           res.end();
         });
 
@@ -61,8 +63,3 @@ exports.admin = function (req, res, next) {
   }
 
 };
-
-function prcessUpload(file) {
-  console.log(file);
-  return Promise.resolve();
-}

@@ -55,7 +55,7 @@ var handleUploadMiddleware = handleUpload();
 app.all('/admin', authBasic, handleUploadMiddleware, routes.admin);
 
 http.createServer(app).listen(app.get('port'), function(){
-  console.log('Express server listening on port ' + app.get('port'));
+  console.info('Express server listening on port ' + app.get('port'));
 });
 
 
@@ -90,7 +90,7 @@ function handleUpload() {
           });
         })
         .catch(function (err) {
-          console.log(err.stack);
+          console.error(err.stack);
           res.end(500);
         });
     }

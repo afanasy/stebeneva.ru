@@ -19,7 +19,27 @@ function save(conf) {
   });
 }
 
+function _delete(section, file) {
+  return new Promise(function(resolve, reject) {
+    fs.readFile(confPath, 'utf8', function (err, conf) {
+      if (err) {
+        return reject(err);
+      }
+      conf = JSON.parse(conf);
+      delete conf[section][file];
+
+      fs.writeFile(confPath, JSON.stringify(conf, null, 2), function (err) {
+        if (err) {
+          return reject(err);
+        }
+        return resolve(conf);
+      });
+    });
+  });
+}
+
 var confModel = {
   save: save,
+  delete: _delete,
 };
 module.exports = confModel;;

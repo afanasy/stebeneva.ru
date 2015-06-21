@@ -8,7 +8,6 @@ describe('Config function', function () {
     conf()
       .then(function (json) {
         expect(json.studio).to.exist;
-        console.log(json);
         done();
       });
   });
@@ -17,7 +16,6 @@ describe('Config function', function () {
     conf('photos/not-found-conf.json')
       .then(function (json) {
         expect(json.studio).to.exist;
-        console.log(json);
         done();
       });
   });

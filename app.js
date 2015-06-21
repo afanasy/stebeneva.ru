@@ -1,4 +1,4 @@
-
+var maxFileSize = 100 * 1024 * 1024; // 100MB
 /**
  * Module dependencies.
  */
@@ -81,6 +81,10 @@ function authBasic(req, res, next) {
 function handleUpload() {
   return multer({
     dest: './uploads/',
+    limits: {
+      fields: 5,
+      fileSize: maxFileSize,
+    },
     onFileUploadComplete: function (file, req, res) {
       saveGD(file, req.body.section)
         .then(function (file) {

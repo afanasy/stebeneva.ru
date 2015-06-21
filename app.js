@@ -12,7 +12,6 @@ var uniqid = require('uniqid');
 var fs = require('fs');
 var Promise = require('bluebird');
 var gd = require('node-gd');
-var gm = Promise.promisifyAll(require('gm'));
 
 var routes = require('./routes');
 var conf = require('./conf');
@@ -174,80 +173,5 @@ function saveGD(file, section) {
         });
 
       })
-  });
-}
-
-function saveGM(file, section) {
-  var thumbWidth = 56;
-  var thumbHeight = 56;
-  var maxWidth = 675;
-  var maxHeight = 450;
-  var name = 'auto' + uniqid() + '.jpg';
-
-  return new Promise(function(resolve, reject) {
-
-    gm(file.path)
-      .size(function (err, size) {
-        if (err) {
-          return reject(err);
-        }
-
-        var width = size.width;
-        var height = size.height;
-
-        if (!width || !height) {
-          return reject(new Error('File size error!' + width + height));
-        }
-
-      })
-      .then(function (size) {
-
-        var thumb = gd.createTrueColor(thumbWidth, thumbHeight);
-
-
-        var ratioWidth = width / maxWidth;
-        var ratioHeight = height / maxHeight;
-
-        // if size exceed max
-        if((ratioWidth > 1) || (ratioHeight > 1)) {
-
-          // get max ratio
-          var ratio = Math.max(ratioWidth, ratioHeight);
-          var targetWidth = width / ratio;
-          var targetHeight = height / ratio;
-          var target = gd.createTrueColor(targetWidth, targetHeight);
-
-          // gd.Image#copyResampled(dest, dx, dy, sx, sy, dw, dh, sw, sh)
-          gd.copyResampled(target, source, 0, 0, 0, 0, targetWidth, targetHeight, width, height);
-          source = target;
-          width = targetWidth;
-          height = targetHeight;
-        }
-
-        var x = 0;
-        var y = 0;
-
-        var size = Math.min(width, height);
-        var offset = Math.abs(width - height) / 2.;
-
-        if(width > height)
-          x += offset;
-        else
-          y += offset;
-
-        gd.copyResampled(thumb, source, 0, 0, x, y, thumbWidth, thumbHeight, size, size);
-        return Promise.all([
-          thumb.imageSaveAsync(path.resolve(__dirname, 'photos', section, 'thumb', name), 100),
-          source.imageSaveAsync(path.resolve(__dirname, 'photos', section, 'slides', name), 100),
-          fs.unlinkAsync(file.path)
-        ])
-        .then(function () {
-          return name;
-        });
-
-      })
-      .then(function (name) {
-        return {file: name};
-      });
   });
 }

@@ -8,6 +8,7 @@ function init(file) {
   var confPath = file || path.resolve(__dirname, 'public/photos/conf.json');
   return fs.readFileAsync(confPath, 'utf8')
     .then(function (text) {
+      if (!text) throw new Error('Error');
       return JSON.parse(text);
     })
     .catch(function () {

@@ -21,10 +21,7 @@ var app = express();
 
 // attach conf
 app.use(function (req, res, next) {
-  var configPath;
-  // if ('local' == app.get('env')) configPath = 'a';
-
-  conf(configPath)
+  conf()
     .then(function (json) {
       app.locals.conf = json;
       app.locals.ucfirst = function(value){

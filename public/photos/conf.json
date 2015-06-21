@@ -1,1 +1,32 @@
-{}
+{
+  "studio": {
+    "autoib6jm6o5.jpg": false,
+    "autoib6jmskp.jpg": false,
+    "autoib6jmsld.jpg": false,
+    "autoib6jmzdc.jpg": false
+  },
+  "portrait": {
+    "autoib6jm6o5.jpg": false,
+    "autoib6jmskp.jpg": false,
+    "autoib6jmsld.jpg": false,
+    "autoib6jmzdc.jpg": false
+  },
+  "reportage": {
+    "autoib6jm6o5.jpg": false,
+    "autoib6jmskp.jpg": false,
+    "autoib6jmsld.jpg": false,
+    "autoib6jmzdc.jpg": false
+  },
+  "models": {
+    "autoib6jm6o5.jpg": false,
+    "autoib6jmskp.jpg": false,
+    "autoib6jmsld.jpg": false,
+    "autoib6jmzdc.jpg": false
+  },
+  "travel": {
+    "autoib6jm6o5.jpg": false,
+    "autoib6jmskp.jpg": false,
+    "autoib6jmzdc.jpg": false,
+    "autoib6jmsld.jpg": false
+  }
+}

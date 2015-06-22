@@ -116,6 +116,7 @@ function saveGD(file, section) {
 
       var width = source.width;
       var height = source.height;
+
       if (!width || !height) {
         return reject(new Error('File size error!' + width + height));
       }
@@ -130,12 +131,14 @@ function saveGD(file, section) {
 
           // get max ratio
           var ratio = Math.max(ratioWidth, ratioHeight);
-          var targetWidth = width / ratio;
-          var targetHeight = height / ratio;
+          var targetWidth = Math.floor(width / ratio);
+          var targetHeight = Math.floor(height / ratio);
+
           var target = gd.createTrueColor(targetWidth, targetHeight);
 
           // gd.Image#copyResampled(dest, dx, dy, sx, sy, dw, dh, sw, sh)
-          target.copyResampled(source, 0, 0, 0, 0, targetWidth, targetHeight, width, height);
+          console.log('source, 0, 0, 0, 0, targetWidth, targetHeight, width, height', source, 0, 0, 0, 0, targetWidth, targetHeight, width, height);
+          source.copyResampled(target, 0, 0, 0, 0, targetWidth, targetHeight, width, height);
           source = target;
           width = targetWidth;
           height = targetHeight;
@@ -145,9 +148,9 @@ function saveGD(file, section) {
         var y = 0;
 
         var size = Math.min(width, height);
-        var offset = Math.abs(width - height) / 2.;
+        var offset = Math.abs(width - height) / 2;
 
-        if(width > height)
+        if (width > height)
           x += offset;
         else
           y += offset;

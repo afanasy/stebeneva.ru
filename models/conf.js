@@ -25,7 +25,12 @@ function _delete(section, file) {
       if (err) {
         return reject(err);
       }
-      conf = JSON.parse(conf);
+      try {
+        conf = JSON.parse(conf);
+      } catch (err) {
+        console.log(conf);
+        return reject(err);
+      }
       delete conf[section][file];
 
       fs.writeFile(confPath, JSON.stringify(conf, null, 2), function (err) {

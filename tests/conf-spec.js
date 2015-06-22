@@ -8,15 +8,15 @@ describe('Config function', function () {
     conf()
       .then(function (json) {
         expect(json.studio).to.exist;
-        done();
-      });
+      })
+      .then(done, done);
   });
 
   it('should get all photos if config json is not found', function (done) {
     conf('photos/not-found-conf.json')
       .then(function (json) {
         expect(json.studio).to.exist;
-        done();
-      });
+      })
+      .then(done, done);
   });
 });

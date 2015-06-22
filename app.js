@@ -137,7 +137,6 @@ function saveGD(file, section) {
           var target = gd.createTrueColor(targetWidth, targetHeight);
 
           // gd.Image#copyResampled(dest, dx, dy, sx, sy, dw, dh, sw, sh)
-          console.log('source, 0, 0, 0, 0, targetWidth, targetHeight, width, height', source, 0, 0, 0, 0, targetWidth, targetHeight, width, height);
           source.copyResampled(target, 0, 0, 0, 0, targetWidth, targetHeight, width, height);
           source = target;
           width = targetWidth;

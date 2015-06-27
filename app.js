@@ -4,7 +4,6 @@ var maxFileSize = 100 * 1024 * 1024; // 100MB
  */
 
 var express = require('express');
-var http = require('http');
 var path = require('path');
 var basicAuth = require('basic-auth');
 var multer = require('multer');
@@ -16,7 +15,7 @@ var gd = require('node-gd');
 var routes = require('./routes');
 var conf = require('./conf');
 var authConf = require('./config');
-var app = express();
+var app = module.exports = express();
 
 // attach conf
 app.use(function (req, res, next) {
@@ -53,10 +52,6 @@ app.get('/contact', routes.contact);
 
 var handleUploadMiddleware = handleUpload();
 app.all('/admin', authBasic, handleUploadMiddleware, routes.admin);
-
-http.createServer(app).listen(app.get('port'), function(){
-  console.info('Express server listening on port ' + app.get('port'));
-});
 
 
 function authBasic(req, res, next) {

@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
-    "start": "node app.js"
+    "start": "node bin/server.js"
   },
   "dependencies": {
     "basic-auth": "^1.0.2",
@@ -16,6 +16,7 @@
     "uniqid": "^1.0.0"
   },
   "devDependencies": {
-    "chai": "^3.0.0"
+    "chai": "^3.0.0",
+    "vhost": "^3.0.0"
   }
 }

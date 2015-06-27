@@ -1,4 +1,4 @@
-var conf = require('./conf');
+var conf = require('../libs/conf');
 
 function confMiddleware(req, res, next) {
   conf()

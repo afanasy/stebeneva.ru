@@ -14,7 +14,7 @@ var gd = require('node-gd');
 
 var routes = require('./routes');
 var conf = require('./conf');
-var authConf = require('./config');
+var authConf = require(process.env.HOME + '/.stebeneva.ru' + '/config');
 var app = module.exports = express();
 
 // attach conf
@@ -40,6 +40,7 @@ app.use(express.urlencoded());
 app.use(express.methodOverride());
 app.use(app.router);
 app.use(express.static(path.join(__dirname, 'public')));
+app.use('/photos', express.static(process.env.HOME + '/.stebeneva.ru/photos'));
 
 // local only
 if ('local' == app.get('env')) {
@@ -153,11 +154,11 @@ function saveGD(file, section) {
         y = Math.floor(y);
 
         source.copyResampled(thumb, 0, 0, +x, +y, thumbWidth, thumbHeight, size, size);
-        thumb.saveJpeg(path.resolve(__dirname, 'public/photos', section, 'thumbs', name), 100, function (err) {
+        thumb.saveJpeg(process.env.HOME + '/.stebeneva.ru/photos/' + section + '/thumbs/' + name, 100, function (err) {
           if (err) {
             return reject(err);
           }
-          source.saveJpeg(path.resolve(__dirname, 'public/photos', section, 'slides', name), 100, function (err) {
+          source.saveJpeg(process.env.HOME + '/.stebeneva.ru/photos/' + section + '/slides/' + name, 100, function (err) {
             if (err) {
               return reject(err);
             }

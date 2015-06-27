@@ -18,5 +18,14 @@
   "devDependencies": {
     "chai": "^3.0.0",
     "vhost": "^3.0.0"
-  }
+  },
+  "gitHead": "d213949f61e57fede9b4e3b6080fb77d21e0b572",
+  "readme": "# stebeneva.ru\n\nAdmin page http://stebeneva.ru/admin\nUsername: test\nPassword: test\nChange in root project directory config.json.\n\n## Setting up\n\nRequirement C++ library for Graphic Editing, libgd2.\nDifferent way for each machine's architecture.\nRefer to: https://github.com/y-a-v-a/node-gd#installation-on-debianubuntu\n\n```\ngit clone https://github.com/akura-co/stebeneva.ru.git &&\ncd stebeneva.ru &&\ngit checkout nodejs &&\nnpm i &&\nnode app\n```\n\n## contact\n\nraabbajam@gmail.com\n",
+  "readmeFilename": "README.md",
+  "description": "Admin page http://stebeneva.ru/admin Username: test Password: test Change in root project directory config.json.",
+  "_id": "stebeneva.ru@0.0.1",
+  "_shasum": "7795e9ad50204477b76303050376197427005e3b",
+  "_from": "git+https://github.com/akura-co/stebeneva.ru.git#nodejs",
+  "_resolved": "git+https://github.com/akura-co/stebeneva.ru.git#d213949f61e57fede9b4e3b6080fb77d21e0b572",
+ "main": "app.js"
 }

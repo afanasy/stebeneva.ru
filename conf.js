@@ -5,7 +5,7 @@ var path = require('path');
 
 function init(file) {
   // try to read conf.json
-  var confPath = file || path.resolve(__dirname, 'public/photos/conf.json');
+  var confPath = file || process.env.HOME + '/.stebeneva.ru/photos/conf.json';
   return fs.readFileAsync(confPath, 'utf8')
     .then(function (text) {
       if (!text) throw new Error('Error');
@@ -35,7 +35,7 @@ function init(file) {
     });
 
   function readFolder(folder) {
-    var folderPath = path.resolve(__dirname, 'public/photos', folder, 'slides');
+    var folderPath = process.env.HOME + '/.stebeneva.ru/photos/' + folder + '/slides';
     return fs.readdirAsync(folderPath)
       .then(function (files) {
         files = files.filter(function (file) {

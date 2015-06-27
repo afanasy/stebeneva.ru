@@ -13,21 +13,11 @@ var Promise = require('bluebird');
 var gd = require('node-gd');
 
 var routes = require('./routes');
-var conf = require('./conf');
 var authConf = require('./config');
 var app = module.exports = express();
 
 // attach conf
-app.use(function (req, res, next) {
-  conf()
-    .then(function (json) {
-      app.locals.conf = json;
-      app.locals.ucfirst = function(value){
-          return value.charAt(0).toUpperCase() + value.slice(1);
-      };
-      return next();
-    });
-});
+app.use(confMiddleware);
 
 // all environments
 app.set('port', process.env.PORT || 3000);

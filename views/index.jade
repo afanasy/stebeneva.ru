@@ -5,7 +5,8 @@ block content
   #slides
     each slides, section in conf
       each show, slide in slides
-        div(id='slide' + i)
-          a(href="/photo/#{section}" title="#{ucfirst(section)}")
-            img(src="/photos/#{section}/slides/#{slide}")
-            - i++;
+        if show
+          div(id='slide' + i)
+            a(href="/photo/#{section}" title="#{ucfirst(section)}")
+              img(src="/photos/#{section}/slides/#{slide}")
+              - i++;

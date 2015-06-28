@@ -1,3 +1,4 @@
+var STEBENEVA_HOME = process.env.HOME_DIR || process.env.HOME;
 var multer = require('multer');
 var Promise = require('bluebird');
 var uniqid = require('uniqid');
@@ -90,11 +91,11 @@ function saveGD(file, section) {
         y = Math.floor(y);
 
         source.copyResampled(thumb, 0, 0, +x, +y, thumbWidth, thumbHeight, size, size);
-        thumb.saveJpeg(process.env.HOME + '/.stebeneva.ru/photos/' + section + '/thumbs/' + name, 100, function (err) {
+        thumb.saveJpeg(STEBENEVA_HOME + '/.stebeneva.ru/photos/' + section + '/thumbs/' + name, 100, function (err) {
           if (err) {
             return reject(err);
           }
-          source.saveJpeg(process.env.HOME + '/.stebeneva.ru/photos/' + section + '/slides/' + name, 100, function (err) {
+          source.saveJpeg(STEBENEVA_HOME + '/.stebeneva.ru/photos/' + section + '/slides/' + name, 100, function (err) {
             if (err) {
               return reject(err);
             }

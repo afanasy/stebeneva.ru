@@ -1,6 +1,7 @@
+var STEBENEVA_HOME = process.env.HOME_DIR || process.env.HOME;
 var Promise = require('bluebird');
 var path = require('path');
-var confPath = path.resolve(__dirname, '../public/photos/conf.json');
+var confPath = path.resolve(STEBENEVA_HOME + '/.stebeneva.ru/photos/conf.json');
 var fs = Promise.promisifyAll(require('fs'));
 
 function save(conf) {

@@ -1,13 +1,9 @@
 var fs = require('fs');
 var gd = require('node-gd');
 var path = require('path');
-var _ = require('lodash');
 
 var photos = require('../models/photos');
 var confModel = require('../models/conf');
-/*
- * GET home page.
- */
 
 exports.index = function(req, res){
   res.render('index');

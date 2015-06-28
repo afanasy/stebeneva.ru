@@ -1,5 +1,6 @@
+var STEBENEVA_HOME = process.env.HOME_DIR || process.env.HOME;
 var basicAuth = require('basic-auth');
-var authConf = require(process.env.HOME + '/.stebeneva.ru' + '/config');
+var authConf = require(STEBENEVA_HOME + '/.stebeneva.ru' + '/config');
 
 function authBasic(req, res, next) {
 

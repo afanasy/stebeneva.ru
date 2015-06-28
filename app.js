@@ -1,4 +1,5 @@
 require('dotenv').load();
+var STEBENEVA_HOME = process.env.HOME_DIR || process.env.HOME;
 /**
  * Module dependencies.
  */
@@ -29,7 +30,7 @@ app.use(express.urlencoded());
 app.use(express.methodOverride());
 app.use(app.router);
 app.use(express.static(path.join(__dirname, 'public')));
-app.use('/photos', express.static(process.env.HOME + '/.stebeneva.ru/photos'));
+app.use('/photos', express.static(STEBENEVA_HOME + '/.stebeneva.ru/photos'));
 
 // local only
 if ('local' == app.get('env')) {

@@ -13,7 +13,7 @@
     "jade": "*",
     "lodash": "^3.9.3",
     "multer": "^0.1.8",
-    "node-gd": "^0.3.3",
+    "node-gd": "^0.5.0",
     "uniqid": "^1.0.0"
   },
   "devDependencies": {

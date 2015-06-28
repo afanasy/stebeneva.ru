@@ -1,3 +1,4 @@
+var STEBENEVA_HOME = process.env.HOME_DIR || process.env.HOME;
 var Promise = require('bluebird');
 var fs = Promise.promisifyAll(require('fs'));
 var path = require('path');
@@ -6,7 +7,7 @@ var path = require('path');
 function init(file) {
 
   // try to read conf.json
-  var confPath = file || process.env.HOME + '/.stebeneva.ru/photos/conf.json';
+  var confPath = file || STEBENEVA_HOME + '/.stebeneva.ru/photos/conf.json';
 
   return fs.readFileAsync(confPath, 'utf8')
     .then(function (text) {
@@ -43,7 +44,7 @@ function init(file) {
     });
 
   function readFolder(folder) {
-    var folderPath = process.env.HOME + '/.stebeneva.ru/photos/' + folder + '/slides';
+    var folderPath = STEBENEVA_HOME + '/.stebeneva.ru/photos/' + folder + '/slides';
 
     return fs.readdirAsync(folderPath)
       .then(function (files) {

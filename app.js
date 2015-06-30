@@ -1,5 +1,3 @@
-require('dotenv').load();
-var STEBENEVA_HOME = process.env.HOME_DIR || process.env.HOME;
 /**
  * Module dependencies.
  */
@@ -27,7 +25,7 @@ var conf = require('./conf');
 
 // middlewares
 var basicAuth = require('basic-auth');
-var authConf = require(STEBENEVA_HOME + '/.stebeneva.ru' + '/config');
+var authConf = require(__dirname + '/.stebeneva.ru' + '/config');
 
 var confMiddleware = function confMiddleware(req, res, next) {
   conf.init()
@@ -96,7 +94,7 @@ app.use(express.urlencoded());
 app.use(express.methodOverride());
 app.use(app.router);
 app.use(express.static(path.join(__dirname, 'public')));
-app.use('/photos', express.static(STEBENEVA_HOME + '/.stebeneva.ru/photos'));
+app.use('/photos', express.static(__dirname + '/.stebeneva.ru/photos'));
 
 // local only
 if ('local' == app.get('env')) {
@@ -180,11 +178,11 @@ function saveGD(file, section) {
         y = Math.floor(y);
 
         source.copyResampled(thumb, 0, 0, +x, +y, thumbWidth, thumbHeight, size, size);
-        thumb.saveJpeg(STEBENEVA_HOME + '/.stebeneva.ru/photos/' + section + '/thumbs/' + name, 100, function (err) {
+        thumb.saveJpeg(__dirname + '/.stebeneva.ru/photos/' + section + '/thumbs/' + name, 100, function (err) {
           if (err) {
             return reject(err);
           }
-          source.saveJpeg(STEBENEVA_HOME + '/.stebeneva.ru/photos/' + section + '/slides/' + name, 100, function (err) {
+          source.saveJpeg(__dirname + '/.stebeneva.ru/photos/' + section + '/slides/' + name, 100, function (err) {
             if (err) {
               return reject(err);
             }

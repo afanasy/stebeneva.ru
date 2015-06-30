@@ -11,6 +11,7 @@ var multer = require('multer');
 var path = require('path');
 var Promise = require('bluebird');
 var uniqid = require('uniqid');
+var http = require('http');
 
 var app = module.exports = express();
 
@@ -109,6 +110,15 @@ app.get('/contact', routes.contact);
 
 // attach admin routes
 app.all('/admin', authBasicMiddleware, handleUploadMiddleware, routes.admin);
+
+// dont have a parent -> called from command line
+if (!module.parent) {
+  http.createServer(app).listen(app.get('port'), function(){
+    console.info('Express server listening on port ' + app.get('port'));
+  });
+}
+
+
 
 
 // utils function

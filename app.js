@@ -40,7 +40,7 @@ var confMiddleware = function confMiddleware(req, res, next) {
 };
 var handleUploadMiddleware = function handleUploadMiddleware() {
   return multer({
-    dest: './uploads/',
+    dest: '/tmp/',
     limits: {
       fields: 5,
       fileSize: MAX_FILE_SIZE,

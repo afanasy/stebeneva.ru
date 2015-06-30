@@ -22,7 +22,7 @@ var MAX_FILE_SIZE = 100 * 1024 * 1024; // 100MB
 var routes = require('./routes');
 
 // libs
-var conf = require('./libs/conf');
+var conf = require('./conf');
 
 // middlewares
 var basicAuth = require('basic-auth');

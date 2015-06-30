@@ -1,15 +1,14 @@
 var STEBENEVA_HOME = process.env.HOME_DIR || process.env.HOME;
+
 var Promise = require('bluebird');
 var fs = Promise.promisifyAll(require('fs'));
 var path = require('path');
 
-
 function init(file) {
-
+  var CONF_PATH = file || STEBENEVA_HOME + '/.stebeneva.ru/photos/conf.json';
   // try to read conf.json
-  var confPath = file || STEBENEVA_HOME + '/.stebeneva.ru/photos/conf.json';
 
-  return fs.readFileAsync(confPath, 'utf8')
+  return fs.readFileAsync(CONF_PATH, 'utf8')
     .then(function (text) {
       if (!text) throw new Error('Error');
       return JSON.parse(text);
@@ -63,4 +62,51 @@ function init(file) {
       .reflect();
   }
 }
-module.exports = init;
+
+function save(conf) {
+  return new Promise(function(resolve, reject) {
+    if (typeof conf === 'string') {
+      conf = JSON.parse(conf);
+    }
+
+    fs.writeFile(confPath, JSON.stringify(conf, null, 2), function (err) {
+      if (err) {
+        return reject(err);
+      }
+      return resolve(conf);
+    });
+
+  });
+}
+
+function _delete(section, file) {
+  return new Promise(function(resolve, reject) {
+    fs.readFile(confPath, 'utf8', function (err, conf) {
+      if (err) {
+        return reject(err);
+      }
+      try {
+        conf = JSON.parse(conf);
+      } catch (err) {
+        console.log(conf);
+        return reject(err);
+      }
+      delete conf[section][file];
+
+      fs.writeFile(confPath, JSON.stringify(conf, null, 2), function (err) {
+        if (err) {
+          return reject(err);
+        }
+        return resolve(conf);
+      });
+    });
+  });
+}
+
+var conf = {
+  init: init,
+  save: save,
+  delete: _delete,
+};
+
+module.exports = confModel;

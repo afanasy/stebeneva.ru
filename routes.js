@@ -3,7 +3,7 @@ var gd = require('node-gd');
 var path = require('path');
 
 var photos = require('../models/photos');
-var confModel = require('../models/conf');
+var conf = require('../conf');
 
 exports.index = function(req, res){
   res.render('index');
@@ -29,7 +29,7 @@ exports.admin = function (req, res, next) {
     // handle save action
     if (req.body.action === 'save') {
 
-      confModel.save(req.body.conf)
+      conf.save(req.body.conf)
         .then(function (value) {
           return res.end();
         }, function (err) {
@@ -49,7 +49,7 @@ exports.admin = function (req, res, next) {
       // yes, delete it
       return photos.delete(section, file)
         .then(function () {
-          return confModel.delete(section, file);
+          return conf.delete(section, file);
         })
         .then(function () {
           res.end();

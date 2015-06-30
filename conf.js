@@ -107,4 +107,4 @@ var conf = {
   delete: _delete,
 };
 
-module.exports = confModel;
+module.exports = conf;

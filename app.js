@@ -3,12 +3,16 @@
  */
 
 var express = require('express');
+var serveStatic = require('serve-static');
+var bodyParser = require('body-parser');
+var morgan = require('morgan');
 var gd = require('node-gd');
 var multer = require('multer');
 var path = require('path');
 var Promise = require('bluebird');
 var fs = require('fs');
 var fse = Promise.promisifyAll(require('fs-extra'));
+var basicAuth = require('basic-auth');
 var uniqid = require('uniqid');
 var http = require('http');
 
@@ -25,7 +29,6 @@ var routes = require('./routes');
 var conf = require('./conf');
 
 // middlewares
-var basicAuth = require('basic-auth');
 var authConf = require(__dirname + '/.stebeneva.ru' + '/config');
 
 var confMiddleware = function confMiddleware(req, res, next) {
@@ -88,14 +91,11 @@ app.use(confMiddleware);
 app.set('port', process.env.PORT || 3000);
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
-//app.use(express.favicon());
-app.use(express.logger('dev'));
-app.use(express.json());
-app.use(express.urlencoded());
-app.use(express.methodOverride());
-app.use(app.router);
-app.use(express.static(path.join(__dirname, 'public')));
-app.use('/photos', express.static(__dirname + '/.stebeneva.ru/photos'));
+app.use(morgan('dev'));
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(serveStatic(path.join(__dirname, 'public')));
+app.use('/photos', serveStatic(__dirname + '/.stebeneva.ru/photos'));
 
 // local only
 if ('local' == app.get('env')) {

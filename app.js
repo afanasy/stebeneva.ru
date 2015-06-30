@@ -30,7 +30,7 @@ var basicAuth = require('basic-auth');
 var authConf = require(STEBENEVA_HOME + '/.stebeneva.ru' + '/config');
 
 var confMiddleware = function confMiddleware(req, res, next) {
-  conf()
+  conf.init()
     .then(function (json) {
       req.app.locals.conf = json;
       req.app.locals.ucfirst = function(value){

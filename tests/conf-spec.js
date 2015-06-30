@@ -5,7 +5,7 @@ describe('Config function', function () {
   this.timeout(10000);
 
   it('should get config json', function (done) {
-    conf()
+    conf.init()
       .then(function (json) {
         expect(json.studio).to.exist;
       })

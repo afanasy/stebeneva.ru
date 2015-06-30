@@ -3,7 +3,8 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
-    "start": "node bin/server.js"
+    "start": "node bin/server.js",
+    "test": "mocha test/*-spec.js"
   },
   "dependencies": {
     "basic-auth": "^1.0.2",

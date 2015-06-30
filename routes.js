@@ -2,8 +2,8 @@ var fs = require('fs');
 var gd = require('node-gd');
 var path = require('path');
 
-var photos = require('../models/photos');
-var conf = require('../conf');
+var photos = require('./photos');
+var conf = require('./conf');
 
 exports.index = function(req, res){
   res.render('index');

@@ -3,7 +3,30 @@
 Admin page http://stebeneva.ru/admin
 Username: test
 Password: test
-Change in root project directory config.json.
+Change in project home directory `config.json`.
+
+## Photos Configuration
+
+Here is a sample of photos configuration `${PROJECT_HOME_DIR}/photos/conf.json`:
+
+```json
+{
+  "studio": {
+    "autoibf4sa19.jpg": false,
+  },
+  "portrait": {
+    "autoibf4sxp1.jpg": false,
+  },
+  "reportage": {
+    "autoibf5t5ic.jpg": true
+  },
+  "models": {},
+  "travel": {}
+}
+```
+
+From root object, each property is photo category, as you can see there is five (5) photo categories, studio, portrait, reportage, models, travel. And each category properties is photos filename as key with `display on front-page` flag as value. When the flag is true, that photos will be displayed at the front-page.
+
 
 ## Setting up
 

@@ -7,6 +7,7 @@ var serveStatic = require('serve-static');
 var bodyParser = require('body-parser');
 var morgan = require('morgan');
 var gd = require('node-gd');
+var sharp = require('sharp');
 var multer = require('multer');
 var path = require('path');
 var Promise = require('bluebird');
@@ -144,19 +145,18 @@ function saveGD(file, section) {
 
   return new Promise(function(resolve, reject) {
 
-    gd.openJpeg(file.path, function (err, source) {
-      if (err) {
-        return reject(err);
-      }
+    var source = sharp(file.path);
+    source
+      .metadata(function (err, metadata) {
+        if (err) {
+          return reject(err);
+        }
+        var width = metadata.width;
+        var height = metadata.height;
 
-      var width = source.width;
-      var height = source.height;
-
-      if (!width || !height) {
-        return reject(new Error('File size error!' + width + height));
-      }
-        var thumb = gd.createTrueColor(thumbWidth, thumbHeight);
-
+        if (!width || !height) {
+          return reject(new Error('File size error!' + width + 'x' + height));
+        }
 
         var ratioWidth = width / maxWidth;
         var ratioHeight = height / maxHeight;
@@ -166,53 +166,30 @@ function saveGD(file, section) {
 
           // get max ratio
           var ratio = Math.max(ratioWidth, ratioHeight);
-          var targetWidth = Math.floor(width / ratio);
-          var targetHeight = Math.floor(height / ratio);
+          width = Math.floor(width / ratio);
+          height = Math.floor(height / ratio);
 
-          var target = gd.createTrueColor(targetWidth, targetHeight);
-
-          // gd.Image#copyResampled(dest, dx, dy, sx, sy, dw, dh, sw, sh)
-          source.copyResampled(target, 0, 0, 0, 0, targetWidth, targetHeight, width, height);
-          source = target;
-          width = targetWidth;
-          height = targetHeight;
+          source = source.resize(width, height);
         }
 
-        var x = 0;
-        var y = 0;
-
-        var size = Math.min(width, height);
-        var offset = Math.abs(width - height) / 2;
-
-        if (width > height)
-          x += offset;
-        else
-          y += offset;
-
-        x = Math.floor(x);
-        y = Math.floor(y);
-
-        source.copyResampled(thumb, 0, 0, +x, +y, thumbWidth, thumbHeight, size, size);
-        thumb.saveJpeg(__dirname + '/.stebeneva.ru/photos/' + section + '/thumbs/' + name, 100, function (err) {
-          if (err) {
+        var thumbFile = __dirname + '/.stebeneva.ru/photos/' + section + '/thumbs/' + name;
+        var slideFile = __dirname + '/.stebeneva.ru/photos/' + section + '/slides/' + name;
+        source
+          .toFile(slideFile)
+          .then(function () {
+            source.resize(thumbWidth, thumbHeight);
+            return source.toFile(thumbFile);
+          })
+          .then(function () {
+            return fs.unlinkAsync(file.path);
+          })
+          .then(function () {
+            return resolve(name);
+          })
+          .catch(function (err) {
+            console.error(err.stack);
             return reject(err);
-          }
-          source.saveJpeg(__dirname + '/.stebeneva.ru/photos/' + section + '/slides/' + name, 100, function (err) {
-            if (err) {
-              return reject(err);
-            }
-            fs.unlinkAsync(file.path)
-              .then(function () {
-                return resolve(name);
-              })
-              .catch(function (err) {
-                console.error(err.stack);
-                return reject(err);
-              });
           });
-
-        });
-
-      })
+      });
   });
 }

@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "start": "node bin/server.js",
-    "test": "mocha test/*-spec.js"
+    "test": "mocha tests/*-spec.js"
   },
   "dependencies": {
     "basic-auth": "^1.0.2",
@@ -18,6 +18,7 @@
     "multer": "^0.1.8",
     "node-gd": "^0.5.0",
     "serve-static": "^1.10.0",
+    "sharp": "^0.10.1",
     "uniqid": "^1.0.0"
   },
   "devDependencies": {

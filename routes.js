@@ -19,7 +19,7 @@ exports.contact = function (req, res) {
 
 exports.admin = function (req, res, next) {
 
-  var conf = req.app.locals.conf;
+  // var conf = req.app.locals.conf;
   if (req.method === 'GET') {
     return res.render('admin');
   }

@@ -1,11 +1,11 @@
 var Promise = require('bluebird');
 var fs = Promise.promisifyAll(require('fs'));
 var path = require('path');
+var CONF_PATH = __dirname + '/.stebeneva.ru/photos/conf.json';
 
 function init(file) {
-  var CONF_PATH = file || __dirname + '/.stebeneva.ru/photos/conf.json';
   // try to read conf.json
-
+  CONF_PATH = file || CONF_PATH;
   return fs.readFileAsync(CONF_PATH, 'utf8')
     .then(function (text) {
       if (!text) throw new Error('Error');
@@ -67,7 +67,7 @@ function save(conf) {
       conf = JSON.parse(conf);
     }
 
-    fs.writeFile(confPath, JSON.stringify(conf, null, 2), function (err) {
+    fs.writeFile(CONF_PATH, JSON.stringify(conf, null, 2), function (err) {
       if (err) {
         return reject(err);
       }
@@ -79,7 +79,7 @@ function save(conf) {
 
 function _delete(section, file) {
   return new Promise(function(resolve, reject) {
-    fs.readFile(confPath, 'utf8', function (err, conf) {
+    fs.readFile(CONF_PATH, 'utf8', function (err, conf) {
       if (err) {
         return reject(err);
       }
@@ -91,7 +91,7 @@ function _delete(section, file) {
       }
       delete conf[section][file];
 
-      fs.writeFile(confPath, JSON.stringify(conf, null, 2), function (err) {
+      fs.writeFile(CONF_PATH, JSON.stringify(conf, null, 2), function (err) {
         if (err) {
           return reject(err);
         }

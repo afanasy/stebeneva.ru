@@ -13,7 +13,7 @@ describe('Config function', function () {
   });
 
   it('should get all photos if config json is not found', function (done) {
-    conf('photos/not-found-conf.json')
+    conf.init('photos/not-found-conf.json')
       .then(function (json) {
         expect(json.studio).to.exist;
       })

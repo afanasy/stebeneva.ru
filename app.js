@@ -20,7 +20,7 @@ var express = require('express')
 , app = module.exports = express()
 
 // constants
-, MAX_FILE_SIZE = 100 * 1024 * 1024 // 100MB
+, MAX_FILE_SIZE = 100 * 1024 * 1024 * 1024 // 100MB
 
 
 // routes
@@ -98,8 +98,8 @@ app.set('port', process.env.PORT || 3000)
 app.set('views', path.join(__dirname, 'views'))
 app.set('view engine', 'jade')
 app.use(morgan('dev'))
-app.use(bodyParser.json())
-app.use(bodyParser.urlencoded({ extended: false }))
+app.use(bodyParser.json({limit: '50mb'}))
+app.use(bodyParser.urlencoded({limit: '50mb', extended: false }))
 app.use(serveStatic(path.join(__dirname, 'public')))
 app.use('/photos', serveStatic(__dirname + '/.stebeneva.ru/photos'))
 

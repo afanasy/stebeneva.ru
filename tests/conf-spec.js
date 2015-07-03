@@ -1,5 +1,5 @@
-var expect = require('chai').expect
-, conf = require('../conf')
+var expect = require('chai').expect,
+conf = require('../conf')
 
 describe('Config function', function () {
   this.timeout(10000)

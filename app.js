@@ -2,37 +2,37 @@
  * Module dependencies.
  */
 
-var express = require('express')
-, serveStatic = require('serve-static')
-, bodyParser = require('body-parser')
-, morgan = require('morgan')
-, gd = require('node-gd')
-, sharp = require('sharp')
-, multer = require('multer')
-, path = require('path')
-, Promise = require('bluebird')
-, fs = require('fs')
-, fse = Promise.promisifyAll(require('fs-extra'))
-, basicAuth = require('basic-auth')
-, uniqid = require('uniqid')
-, http = require('http')
+var express = require('express'),
+serveStatic = require('serve-static'),
+bodyParser = require('body-parser'),
+morgan = require('morgan'),
+gd = require('node-gd'),
+sharp = require('sharp'),
+multer = require('multer'),
+path = require('path'),
+Promise = require('bluebird'),
+fs = require('fs'),
+fse = Promise.promisifyAll(require('fs-extra')),
+basicAuth = require('basic-auth'),
+uniqid = require('uniqid'),
+http = require('http'),
 
-, app = module.exports = express()
+app = module.exports = express(),
 
 // constants
-, MAX_FILE_SIZE = 100 * 1024 * 1024 * 1024 // 100MB
+MAX_FILE_SIZE = 100 * 1024 * 1024 * 1024 // 100MB
 
 
 // routes
-, routes = require('./routes')
+routes = require('./routes'),
 
 // libs
-, conf = require('./conf')
+conf = require('./conf'),
 
-// middlewares
-, authConf = require(__dirname + '/.stebeneva.ru' + '/config')
+// middlewares,
+authConf = require(__dirname + '/.stebeneva.ru' + '/config'),
 
-, confMiddleware = function confMiddleware(req, res, next) {
+confMiddleware = function confMiddleware(req, res, next) {
   conf.
     init().
     then(function (json) {
@@ -46,15 +46,15 @@ var express = require('express')
       }
       return next()
     })
-}
-, handleUploadMiddleware = function handleUploadMiddleware() {
+},
+handleUploadMiddleware = function handleUploadMiddleware() {
   return multer({
-      dest: '/tmp/'
-    , limits: {
-        fields: 5
-      , fileSize: MAX_FILE_SIZE
-    }
-    , onFileUploadComplete: function (file, req, res) {
+    dest: '/tmp/',
+    limits: {
+      fields: 5,
+      fileSize: MAX_FILE_SIZE
+    },
+    onFileUploadComplete: function (file, req, res) {
       saveGD(file, req.body.section).
         then(function (file) {
 
@@ -69,8 +69,8 @@ var express = require('express')
         })
     }
   })
-}()
-, authBasicMiddleware = function (req, res, next) {
+}(),
+authBasicMiddleware = function (req, res, next) {
 
   function unauthorized(res) {
     res.set('WWW-Authenticate', 'Basic realm=Authorization Required')
@@ -142,11 +142,11 @@ function init() {
 }
 
 function saveGD(file, section) {
-  var thumbWidth = 56
-  , thumbHeight = 56
-  , maxWidth = 675
-  , maxHeight = 450
-  , name = 'auto' + uniqid() + '.jpg'
+  var thumbWidth = 56,
+  thumbHeight = 56,
+  maxWidth = 675,
+  maxHeight = 450,
+  name = 'auto' + uniqid() + '.jpg'
 
   return new Promise(function(resolve, reject) {
 
@@ -156,15 +156,15 @@ function saveGD(file, section) {
         if (err) {
           return reject(err)
         }
-        var width = metadata.width
-        , height = metadata.height
+        var width = metadata.width,
+        height = metadata.height
 
         if (!width || !height) {
           return reject(new Error('File size error!' + width + 'x' + height))
         }
 
-        var ratioWidth = width / maxWidth
-        , ratioHeight = height / maxHeight
+        var ratioWidth = width / maxWidth,
+        ratioHeight = height / maxHeight
 
         // if size exceed max
         if ((ratioWidth > 1) || (ratioHeight > 1)) {
@@ -177,8 +177,8 @@ function saveGD(file, section) {
           source = source.resize(width, height)
         }
 
-        var thumbFile = __dirname + '/.stebeneva.ru/photos/' + section + '/thumbs/' + name
-        , slideFile = __dirname + '/.stebeneva.ru/photos/' + section + '/slides/' + name
+        var thumbFile = __dirname + '/.stebeneva.ru/photos/' + section + '/thumbs/' + name,
+        slideFile = __dirname + '/.stebeneva.ru/photos/' + section + '/slides/' + name
 
         source.
           toFile(slideFile).

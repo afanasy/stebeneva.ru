@@ -1,9 +1,9 @@
-var fs = require('fs')
-, gd = require('node-gd')
-, path = require('path')
+var fs = require('fs'),
+gd = require('node-gd'),
+path = require('path'),
 
-, photos = require('./photos')
-, conf = require('./conf')
+photos = require('./photos'),
+conf = require('./conf')
 
 exports.index = function(req, res){
   res.render('index')
@@ -39,8 +39,8 @@ exports.admin = function (req, res, next) {
 
     } else if (req.body.action === 'delete') {
 
-      var file = path.basename(req.body.file)
-      , section = req.body.section
+      var file = path.basename(req.body.file),
+      section = req.body.section
 
       // check if section is in conf
       if (Object.keys(conf).indexOf(section) === -1) {

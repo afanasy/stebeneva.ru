@@ -1,7 +1,7 @@
-var Promise = require('bluebird')
-, fs = Promise.promisifyAll(require('fs'))
-, path = require('path')
-, CONF_PATH = __dirname + '/.stebeneva.ru/photos/conf.json'
+var Promise = require('bluebird'),
+fs = Promise.promisifyAll(require('fs')),
+path = require('path'),
+CONF_PATH = __dirname + '/.stebeneva.ru/photos/conf.json'
 
 function init(file) {
 
@@ -17,11 +17,11 @@ function init(file) {
 
       // failed, create conf from folder
       var folders = [
-          'studio'
-        , 'portrait'
-        , 'reportage'
-        , 'models'
-        , 'travel'
+        'studio',
+        'portrait',
+        'reportage',
+        'models',
+        'travel'
       ]
 
       return Promise.map(folders, readFolder).
@@ -63,8 +63,8 @@ function init(file) {
         })
 
         return {
-            folder: folder
-          , files: files
+          folder: folder,
+          files: files
         }
 
       }).
@@ -107,9 +107,9 @@ function _delete(section, file) {
 }
 
 var conf = {
-    init: init
-  , save: save
-  , delete: _delete
+  init: init,
+  save: save,
+  delete: _delete
 }
 
 module.exports = conf

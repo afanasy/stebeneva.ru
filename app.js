@@ -20,7 +20,7 @@ http = require('http'),
 app = module.exports = express(),
 
 // constants
-MAX_FILE_SIZE = 100 * 1024 * 1024 * 1024 // 100MB
+MAX_FILE_SIZE = 100 * 1024 * 1024 * 1024, // 100MB
 
 
 // routes
@@ -28,9 +28,30 @@ routes = require('./routes'),
 
 // libs
 conf = require('./conf'),
+authConf,
+imageConf,
 
 // middlewares,
-authConf = require(__dirname + '/.stebeneva.ru' + '/config'),
+files = [
+  'conf.json',
+  'config.json'
+]
+
+files.map(function (file) {
+  fse.ensureFileSync(path.resolve(__dirname, file))
+})
+
+try {
+  authConf = fse.readJsonSync(path.resolve(__dirname, 'config.json'))
+} catch (e) {
+  authConf = {
+    auth: {
+      username: 'test',
+      password: 'test'
+    }
+  }
+  fse.writeJsonSync(path.resolve(__dirname, 'config.json'), authConf)
+}
 
 confMiddleware = function confMiddleware(req, res, next) {
   conf.
@@ -136,9 +157,27 @@ init().
 
 // initial function, checking directory
 function init() {
-  var dir = path.resolve(__dirname, '.stebeneva.ru')
-  // ensure dir will create folder if it is not exist
-  return fse.ensureDirAsync(dir)
+  var dirs = [
+    'models',
+    'portrait',
+    'reportage',
+    'studio',
+    'travel'
+  ]
+
+  // ensure dir will create folder structure if it is not exist
+  return Promise.map(dirs, function (dir) {
+    dir = [
+      path.resolve(__dirname, '.stebeneva.ru', 'photos', dir, 'slides'),
+      path.resolve(__dirname, '.stebeneva.ru', 'photos', dir, 'thumbs')
+    ]
+    return Promise.map(dir, function (_dir) {
+      fse.ensureDirAsync(_dir)
+    })
+  })
+  .then(function () {
+    return conf.init()
+  })
 }
 
 function saveGD(file, section) {

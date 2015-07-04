@@ -1,7 +1,7 @@
 var Promise = require('bluebird'),
 fs = Promise.promisifyAll(require('fs')),
 path = require('path'),
-CONF_PATH = __dirname + '/.stebeneva.ru/photos/conf.json'
+CONF_PATH = path.resolve(__dirname, 'conf.json')
 
 function init(file) {
 
@@ -34,19 +34,20 @@ function init(file) {
             map(function (res) {
               return res.value()
             })
-
           return results.
             reduce(function (conf, result) {
-              var files = {}
+              files = {}
 
               result.files.forEach(function (file) {
                 files[file] = false
               })
 
               conf[result.folder] = files
-
               return conf
             }, {})
+        })
+        .then(function (conf) {
+          return save(conf)
         })
 
     })

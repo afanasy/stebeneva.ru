@@ -1,9 +1,9 @@
-var fs = require('fs'),
-gd = require('node-gd'),
-path = require('path'),
+var
+  fs = require('fs'),
+  path = require('path'),
 
-photos = require('./photos'),
-conf = require('./conf')
+  photos = require('./photos'),
+  conf = require('./conf')
 
 exports.index = function(req, res){
   res.render('index')
@@ -19,11 +19,9 @@ exports.contact = function (req, res) {
 
 exports.admin = function (req, res, next) {
 
-  // var conf = req.app.locals.conf;
   if (req.method === 'GET') {
     return res.render('admin')
   }
-
 
   if (req.method === 'POST') {
     // handle save action

@@ -2,40 +2,39 @@
  * Module dependencies.
  */
 
-var express = require('express'),
-serveStatic = require('serve-static'),
-bodyParser = require('body-parser'),
-morgan = require('morgan'),
-gd = require('node-gd'),
-sharp = require('sharp'),
-multer = require('multer'),
-path = require('path'),
-Promise = require('bluebird'),
-fs = require('fs'),
-fse = Promise.promisifyAll(require('fs-extra')),
-basicAuth = require('basic-auth'),
-uniqid = require('uniqid'),
-http = require('http'),
+var
+  express = require('express'),
+  serveStatic = require('serve-static'),
+  bodyParser = require('body-parser'),
+  morgan = require('morgan'),
+  sharp = require('sharp'),
+  multer = require('multer'),
+  path = require('path'),
+  Promise = require('bluebird'),
+  fs = require('fs'),
+  fse = Promise.promisifyAll(require('fs-extra')),
+  basicAuth = require('basic-auth'),
+  uniqid = require('uniqid'),
+  http = require('http'),
 
-app = module.exports = express(),
+  app = module.exports = express(),
 
-// constants
-MAX_FILE_SIZE = 100 * 1024 * 1024 * 1024, // 100MB
+  // constants
+  MAX_FILE_SIZE = 100 * 1024 * 1024 * 1024, // 100MB
 
+  // routes
+  routes = require('./routes'),
 
-// routes
-routes = require('./routes'),
+  // libs
+  conf = require('./conf'),
+  authConf,
+  imageConf,
 
-// libs
-conf = require('./conf'),
-authConf,
-imageConf,
-
-// middlewares,
-files = [
-  'conf.json',
-  'config.json'
-]
+  // middlewares,
+  files = [
+    'conf.json',
+    'config.json'
+  ]
 
 files.map(function (file) {
   fse.ensureFileSync(path.resolve(__dirname, file))
@@ -76,7 +75,7 @@ handleUploadMiddleware = function handleUploadMiddleware() {
       fileSize: MAX_FILE_SIZE
     },
     onFileUploadComplete: function (file, req, res) {
-      saveGD(file, req.body.section).
+      saveImage(file, req.body.section).
         then(function (file) {
 
           res.json({
@@ -180,7 +179,7 @@ function init() {
   })
 }
 
-function saveGD(file, section) {
+function saveImage(file, section) {
   var thumbWidth = 56,
   thumbHeight = 56,
   maxWidth = 675,

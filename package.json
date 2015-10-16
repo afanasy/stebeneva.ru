@@ -1,6 +1,6 @@
 {
   "name": "stebeneva.ru",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "scripts": {
     "start": "node bin/server.js",
     "test": "./node_modules/.bin/mocha test"

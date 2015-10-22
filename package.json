@@ -16,7 +16,7 @@
     "morgan": "^1.6.0",
     "multer": "^0.1.8",
     "serve-static": "^1.10.0",
-    "sharp": "^0.10.1",
+    "sharp": "^0.11.3",
     "uniqid": "^1.0.0"
   },
   "devDependencies": {
@@ -26,6 +26,6 @@
   },
   "main": "app.js",
   "engines": {
-    "node": "0.12.4"
+    "node": "4.1.1"
   }
 }

@@ -39,7 +39,7 @@ app.set('view engine', 'jade')
 app.use(morgan('dev'))
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({extended: true}))
-app.use(express.static('public'))
+app.use(express.static(__dirname + '/public'))
 app.use('/photos', express.static(photosDir))
 app.use(function (req, res, next) {
   res.locals = {

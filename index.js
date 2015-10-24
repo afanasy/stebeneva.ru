@@ -1,4 +1,3 @@
-process.chdir(__dirname)
 var
   _ = require('underscore'),
   express = require('express'),
@@ -35,7 +34,7 @@ _.each(_.keys(config.section), function (section) {
   })
 })
 
-app.set('views', 'views')
+app.set('views', __dirname + '/views')
 app.set('view engine', 'jade')
 app.use(morgan('dev'))
 app.use(bodyParser.json())

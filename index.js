@@ -1,3 +1,4 @@
+process.chdir(__dirname)
 var
   _ = require('underscore'),
   express = require('express'),

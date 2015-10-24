@@ -51,12 +51,11 @@ $(function() {
       $.ajax({
         'type': 'POST',
         'url': '/admin',
-        // 'contentType': 'multipart/form-data',
         'contentType': false,
         'data': formData,
         'processData': false,
         'success': function(thumb) {return function(data) {
-          if(data.file) {
+          if (data.file) {
             render(null, data.file, thumb)
             save()
           }
@@ -85,7 +84,7 @@ $(function() {
     save()
   })
 
-  for(var section in conf) {
+  for (var section in conf) {
     var title = section.charAt(0).toUpperCase() + section.slice(1)
     var a = $('<a>')
       .attr('href', '#' + section)

@@ -1,0 +1,18 @@
+{
+  "auth": {
+    "username": "test",
+    "password": "test"
+  },
+  "section": {
+    "studio": {},
+    "portrait": {},
+    "models": {},
+    "reportage": {},
+    "travel": {}
+  },
+  "thumbSize": 56,
+  "slideSize": {
+    "width": 675,
+    "height": 450
+  }
+}

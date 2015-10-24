@@ -1,7 +1,15 @@
 var Promise = require('bluebird'),
 fs = Promise.promisifyAll(require('fs')),
 path = require('path'),
-CONF_PATH = path.resolve(__dirname, 'conf.json')
+CONF_PATH = path.resolve(__dirname, 'conf.json'),
+HOME_DIR
+
+try {
+  HOME_DIR = __dirname.match(/^\/home\/\S+?\//)[0]
+} catch (e) {
+  console.log('Cannot find home folder, does this file placed under home folder?', e)
+  throw e
+}
 
 function init(file) {
 
@@ -53,7 +61,7 @@ function init(file) {
     })
 
   function readFolder(folder) {
-    var folderPath = __dirname + '/.stebeneva.ru/photos/' + folder + '/slides'
+    var folderPath = path.resolve(HOME_DIR, '.stebeneva.ru/photos/', folder, '/slides')
 
     return fs.readdirAsync(folderPath).
       then(function (files) {

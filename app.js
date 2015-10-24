@@ -34,7 +34,15 @@ var
   files = [
     'conf.json',
     'config.json'
-  ]
+  ],
+  HOME_DIR
+
+try {
+  HOME_DIR = __dirname.match(/^\/home\/\S+?\//)[0]
+} catch (e) {
+  console.log('Cannot find home folder, does this file placed under home folder?', e)
+  throw e
+}
 
 files.map(function (file) {
   fse.ensureFileSync(path.resolve(__dirname, file))
@@ -121,7 +129,7 @@ app.use(morgan('dev'))
 app.use(bodyParser.json({limit: '50mb'}))
 app.use(bodyParser.urlencoded({limit: '50mb', extended: false }))
 app.use(serveStatic(path.join(__dirname, 'public')))
-app.use('/photos', serveStatic(__dirname + '/.stebeneva.ru/photos'))
+app.use('/photos', serveStatic(path.resolve(HOME_DIR, '.stebeneva.ru/photos')))
 
 // local only
 if ('local' === app.get('env')) {
@@ -167,8 +175,8 @@ function init() {
   // ensure dir will create folder structure if it is not exist
   return Promise.map(dirs, function (dir) {
     dir = [
-      path.resolve(__dirname, '.stebeneva.ru', 'photos', dir, 'slides'),
-      path.resolve(__dirname, '.stebeneva.ru', 'photos', dir, 'thumbs')
+      path.resolve(HOME_DIR, '.stebeneva.ru', 'photos', dir, 'slides'),
+      path.resolve(HOME_DIR, '.stebeneva.ru', 'photos', dir, 'thumbs')
     ]
     return Promise.map(dir, function (_dir) {
       fse.ensureDirAsync(_dir)
@@ -215,8 +223,8 @@ function saveImage(file, section) {
           source = source.resize(width, height)
         }
 
-        var thumbFile = __dirname + '/.stebeneva.ru/photos/' + section + '/thumbs/' + name,
-        slideFile = __dirname + '/.stebeneva.ru/photos/' + section + '/slides/' + name
+        var thumbFile = path.resolve(HOME_DIR, '.stebeneva.ru/photos', section, 'thumbs', name),
+        slideFile = path.resolve(HOME_DIR, '.stebeneva.ru/photos', section, 'slides', name)
 
         source.
           toFile(slideFile).

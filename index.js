@@ -36,7 +36,8 @@ _.each(_.keys(config.section), function (section) {
 
 app.set('views', __dirname + '/views')
 app.set('view engine', 'jade')
-app.use(morgan('dev'))
+if (!module.parent)
+  app.use(morgan('dev'))
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({extended: true}))
 app.use(express.static(__dirname + '/public'))

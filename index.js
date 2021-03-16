@@ -81,11 +81,9 @@ app.all('/admin',
         return res.end()
       sharp(file.path).
         resize(config.slideSize.width, config.slideSize.height).
-        crop('center').
         toFile(photosDir + '/' + req.body.section + '/slides/' + name, function () {
           sharp(file.path).
             resize(config.thumbSize, config.thumbSize).
-            crop('center').
             toFile(photosDir + '/' + req.body.section + '/thumbs/' + name, function () {
               fs.unlink(file.path)
               res.json({file: name})
@@ -107,6 +105,7 @@ app.all('/admin',
       }
     }
     fs.writeFile(configPath, JSON.stringify(config, null, 2), _.noop)
+    res.json({})
   }
 )
 

@@ -85,7 +85,7 @@ app.all('/admin',
           sharp(file.path).
             resize(config.thumbSize, config.thumbSize).
             toFile(photosDir + '/' + req.body.section + '/thumbs/' + name, function () {
-              fs.unlink(file.path)
+              fs.unlink(file.path, _.noop)
               res.json({file: name})
             })
         })
@@ -105,7 +105,8 @@ app.all('/admin',
       }
     }
     fs.writeFile(configPath, JSON.stringify(config, null, 2), _.noop)
-    res.json({})
+    if (req.body.action)
+      res.json({})
   }
 )
 

@@ -7,6 +7,6 @@ block content
       each show, slide in slides
         if show
           div(id='slide' + i)
-            a(href="/photo/#{section}" title="#{section}")
-              img(src="/photos/#{section}/slides/#{slide}")
+            a(href='/photo/' + section title=section)
+              img(src='/photos/' + section + '/slides/' + slide)
               - i++;

@@ -1,115 +1,94 @@
-var
-  _ = require('underscore'),
-  express = require('express'),
-  bodyParser = require('body-parser'),
-  morgan = require('morgan'),
-  sharp = require('sharp'),
-  multer = require('multer'),
-  fs = require('fs'),
-  fsExtra = require('fs-extra'),
-  basicAuth = require('basic-auth'),
-  uniqid = require('uniqid'),
-  config = require('./config'),
-  name = require('./package').name,
-  app = module.exports = express()
+var _ = require('underscore')
+var express = require('express')
+var bodyParser = require('body-parser')
+var morgan = require('morgan')
+var sharp = require('sharp')
+var multer = require('multer')
+var fs = require('fs')
+var uniqid = require('uniqid')
+var config = require('./config')
+var packageName = require('./package').name
 
-var home
-try {
-  home = __dirname.match(/^\/home\/[^\/]+/)[0]
-} catch (e) {
-  home = '/home/ubuntu'
-}
-home += '/.' + name
+var photosDir = __dirname + '/../.' + packageName + '/photos'
+var configPath = __dirname + '/../.' + packageName + '/config.json'
 
-var photosDir = home + '/photos'
-var configPath = home + '/config.json'
+_.extend(config, require(configPath))
 
-try {
-  config = _.extend(config, require(configPath))
-} catch (e) {}
-
-_.each(_.keys(config.section), function (section) {
-  _.each(['thumbs', 'slides'], function (dir) {
-    fsExtra.ensureDir(photosDir + '/' + section + '/' + dir)
+_.each(_.keys(config.section), section => {
+  _.each(['thumbs', 'slides'], dir => {
+    try {
+      fs.mkdirSync(photosDir + '/' + section + '/' + dir)
+    }
+    catch (e) {}
   })
 })
 
-app.set('views', __dirname + '/views')
-app.set('view engine', 'jade')
-if (!module.parent)
-  app.use(morgan('dev'))
-app.use(bodyParser.json())
-app.use(bodyParser.urlencoded({extended: true}))
-app.use(express.static(__dirname + '/public'))
-app.use('/photos', express.static(photosDir))
-app.use(function (req, res, next) {
-  res.locals = {
-    conf: config.section,
-    googleAnalytics: config.googleAnalytics
-  }
-  next()
-})
-
-app.get('/', function (req, res) {
-  res.render('index')
-})
-app.get('/photo/:section', function (req, res) {
-  res.render('photo', {section: req.params.section})
-})
-app.get('/contact', function (req, res) {
-  res.render('contact')
-})
-
-app.all('/admin',
-  function (req, res, next) {
-    var user = basicAuth(req)
-    if (!user || (user.name !== config.auth.username) || (user.pass !== config.auth.password)) {
-      res.setHeader('WWW-Authenticate', 'Basic realm="' + name + '"')
-      res.sendStatus(401)
-      return
+var app = module.exports = express().
+  set('views', __dirname + '/views').
+  set('view engine', 'pug').
+  use(bodyParser.json()).
+  use(bodyParser.urlencoded({extended: true})).
+  use(express.static(__dirname + '/public')).
+  use('/photos', express.static(photosDir)).
+  use((req, res, next) => {
+    res.locals = {
+      conf: config.section,
+      googleAnalytics: config.googleAnalytics
     }
     next()
-  },
-  multer({
-    dest: '/tmp/',
-    limits: {
-      fields: 5,
-      fileSize: 100 * 1024 * 1024 * 1024, // 100MB
+  }).
+  get('/', (req, res) => {
+    res.render('index')
+  }).
+  get('/photo/:section', (req, res) => {
+    res.render('photo', {section: req.params.section})
+  }).
+  get('/contact', (req, res) => {
+    res.render('contact')
+  }).
+  use('/admin',
+    (req, res, next) => {
+      if (req.headers.authorization !== 'Basic ' + Buffer.from(config.auth.username + ':' + config.auth.password).toString('base64'))
+        return res.set('WWW-Authenticate', 'Basic realm="' + packageName + '"').sendStatus(401)
+      next()
     },
-    onFileUploadComplete: function (file, req, res) {
+    multer({
+      dest: '/tmp/',
+      limits: {
+        fileSize: 1 << 27, //134MB
+      }
+    }).any()
+  ).
+  get('/admin', (req, res) => {
+    res.render('admin', {config: config})
+  }).
+  post('/admin', (req, res) => {
+    var file = _.findWhere(req.files, {fieldname: 'file'})
+    if (file && config.section[req.body.section]) {
       var name = 'auto' + uniqid() + '.png'
-      if (!config.section[req.body.section])
-        return res.end()
       sharp(file.path).
         resize(config.slideSize.width, config.slideSize.height).
-        toFile(photosDir + '/' + req.body.section + '/slides/' + name, function () {
+        toFile(photosDir + '/' + req.body.section + '/slides/' + name, () => {
           sharp(file.path).
             resize(config.thumbSize, config.thumbSize).
-            toFile(photosDir + '/' + req.body.section + '/thumbs/' + name, function () {
-              fs.unlink(file.path, _.noop)
-              res.json({file: name})
+            toFile(photosDir + '/' + req.body.section + '/thumbs/' + name, () => {
+              fs.unlink(file.path, () =>
+                res.json({file: name})
+              )
             })
         })
+      return
     }
-  }),
-  function (req, res) {
-    if (req.method == 'GET')
-      return res.render('admin', {config: config})
     if (req.body.action == 'save')
       config.section = JSON.parse(req.body.conf)
     if (req.body.action == 'delete') {
       if (config.section[req.body.section] && config.section[req.body.section][req.body.file]) {
         delete config.section[req.body.section][req.body.file]
-        _.each(['thumbs', 'slides'], function (dir) {
+        _.each(['thumbs', 'slides'], dir => {
           fs.unlink(photosDir + '/' + section + '/' + dir + '/' + name, _.noop)
         })
       }
     }
     fs.writeFile(configPath, JSON.stringify(config, null, 2), _.noop)
-    if (req.body.action)
-      res.json({})
-  }
-)
-
-if (!module.parent)
-  app.listen(3000)
+    res.json({})
+  })

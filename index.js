@@ -1,7 +1,6 @@
 var _ = require('underscore')
 var express = require('express')
 var bodyParser = require('body-parser')
-var morgan = require('morgan')
 var sharp = require('sharp')
 var multer = require('multer')
 var fs = require('fs')

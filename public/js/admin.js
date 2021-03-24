@@ -55,9 +55,9 @@ $(function() {
         'data': formData,
         'processData': false,
         'success': function(thumb) {return function(data) {
-          if (data.file) {
-            render(null, data.file, thumb)
-            save()
+          if (data.filename) {
+            render(null, data.filename, thumb)
+            //save()
           }
           else
             thumb.remove()
@@ -71,7 +71,8 @@ $(function() {
     var section = $('.tab-pane.active').attr('id')
     var file = $('#slide').attr('file')
     conf[section][file] = $(this).is(':checked')
-    save()
+    $.post('/admin', {action: 'update', section: section, file: file, frontpage: +conf[section][file]})
+    //save()
   })
 
   $('.delete').on('click', function(e) {
@@ -79,9 +80,9 @@ $(function() {
     var file = $('#slide').attr('file')
     $('#slide').modal('hide')
     $('.tab-pane#' + section + ' .thumb[file="' + file + '"]').fadeOut(function() {$(this).remove()})
+    delete conf[section][file]    
     $.post('/admin', {action: 'delete', section: section, file: file})
-    delete conf[section][file]
-    save()
+    //save()
   })
 
   for (var section in conf) {

@@ -1,15 +1,5 @@
 {
-  "auth": {
-    "username": "test",
-    "password": "test"
-  },
-  "section": {
-    "studio": {},
-    "portrait": {},
-    "models": {},
-    "reportage": {},
-    "travel": {}
-  },
+  "googleAnalytics": "UA-23443151-1",
   "thumbSize": 56,
   "slideSize": {
     "width": 675,

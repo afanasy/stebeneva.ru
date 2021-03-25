@@ -1,3 +1,7 @@
+body {
+  zoom: 125%;
+}
+
 span {
  display:none;
 }

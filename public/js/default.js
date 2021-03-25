@@ -1,1 +1,0 @@
-$.event.props.push('dataTransfer')

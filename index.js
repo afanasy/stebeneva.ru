@@ -15,7 +15,7 @@ var app = module.exports = express().
   set('view engine', 'pug').
   use(bodyParser.json()).
   use(bodyParser.urlencoded({extended: true})).
-  use(express.static(__dirname + '/public', {maxAge: '1 day'})).
+  use(express.static(__dirname + '/public')).//, {maxAge: '1 day'})).
   get('/photos/:name/:type/:filename', (req, res) => {
     db.select('section', {name: req.params.name}, 'id', (err, data) => {
       if (!data[0])
@@ -101,7 +101,7 @@ var app = module.exports = express().
     }
     if (req.body.action == 'update') {
       section((err, section) => {
-        db.update('photo', {sectionId: section.id, filename: req.body.file}, {frontpage: req.body.frontpage}, (err, data) => {
+        db.update('photo', {sectionId: section.id, filename: req.body.filename}, {frontpage: req.body.frontpage}, (err, data) => {
           res.json({})
         })
       })
@@ -109,7 +109,7 @@ var app = module.exports = express().
     }
     if (req.body.action == 'delete') {
       section((err, section) => {
-        db.select('photo', {sectionId: section.id, filename: req.body.file}, ['id', 'position'], (err, data) => {
+        db.select('photo', {sectionId: section.id, filename: req.body.filename}, ['id', 'position'], (err, data) => {
           if (!data[0])
             return done()
           db.delete('photo', data[0].id, () => {
@@ -123,7 +123,7 @@ var app = module.exports = express().
     }
     if (req.body.action == 'save') {
       var update = []
-      _.each(JSON.parse(req.body.conf), (section, name) => {
+      _.each(req.body.conf, (section, name) => {
         var localSection = _.keys(config.section[name])
         _.each(_.keys(section), (filename, i) => {
           var indexOf = localSection.indexOf(filename)

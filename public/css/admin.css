@@ -1,53 +1,22 @@
 body {
- font-family: Helvetica;
- padding: 20px;
+  font-family: Helvetica;
+  padding: 20px;
 }
 
 .nav li {
- font-weight: bold;
-}
-
-.slides {
- position: absolute;
- top: 60px;
- right: 15px;
- bottom: 15px;
- left: 15px;
- padding: 15px;
-}
-
-.thumb {
- float: left;
- width: 56px;
- height: 56px;
- margin: 10px;
- border-radius: 5px;
- box-shadow: 0px 0px 5px 0px black;
-}
-
-.thumb:hover {
- cursor: pointer;
-}
-
-.thumb img {
- opacity: 0.8;
- border-radius: 5px;
-}
-
-.thumb img:hover {
- opacity: 1.0;
+  font-weight: bold;
 }
 
 .close {
- margin-top: -5px;
- margin-bottom: 20px;
+  margin-top: -5px;
+  margin-bottom: 20px;
 }
 
 .modal-body {
- max-height: 480px;
+  max-height: 480px;
 }
 
 .modal-body img {
- display: block;
- margin: 0px auto;
+  display: block;
+  margin: 0px auto;
 }

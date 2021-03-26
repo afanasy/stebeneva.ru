@@ -1,89 +1,10 @@
 var _ = window._
 var superagent = window.superagent
-var conf = window.conf
+var config = window.config
 var thumbSize = 56
 var opacity = .8
 
 $(function () {
-  function thumb (d) {
-    function render (update) {
-      _.extend(d, update)
-      box.empty().off().stop(true).addClass('thumb').
-        css({
-          cursor: 'pointer',
-          float: 'left',
-          width: thumbSize,
-          height: thumbSize,
-          margin: '20px 0 0 20px',
-          'border-radius': 5,
-          border: '1px solid #ccc',
-          'box-shadow': '0px 0px 3px 0px black',
-          'background-size': 'cover',
-          'background-position': 'center',
-          'background-repeat': 'no-repeat',
-          opacity: opacity
-        })
-      if (d.file && !d.filename) {
-        superagent.post('/admin').field({section: d.section}).attach('file', d.file).end(function (err, res) {
-          if (res.body && res.body.filename)
-            return render({section: d.section, filename: res.body.filename})
-          box.remove()
-        })
-        return box.css({opacity: 1}).effect('pulsate', {times: 10000}, 10000 * 1000)
-      }
-      return box.
-        css({
-          'background-image': 'url(/photos/' + d.section + '/thumbs/' + d.filename + ')',
-          opacity: opacity
-        }).
-        on('click', function () {
-          modal({
-            body: $('<img>').attr('src', '/photos/' + d.section + '/slides/' + d.filename),
-            footer: [
-              $('<div>').addClass('form-check').css({'margin-right': 'auto'}).append(
-                $('<input>').
-                  attr({type: 'checkbox', id: 'frontpage'}).
-                  addClass('form-check-input').
-                  prop('checked', conf[d.section][d.filename]).
-                  change(function () {
-                    conf[d.section][d.filename] = $(this).is(':checked')
-                    superagent.post('/admin').send({action: 'update', section: d.section, file: d.filename, frontpage: +conf[d.section][d.filename]}).end()
-                  }),
-                $('<label>').attr({for: 'frontpage'}).text('Show on frontpage')
-              ),
-              $('<button>').addClass('btn btn-danger').text('Delete').click(function () {
-                $(this).closest('.modal').modal('hide')
-                box.fadeOut(function() {
-                  box.remove()
-                })
-                delete conf[d.section][d.filename]
-                superagent.post('/admin').send({action: 'delete', section: d.section, filename: d.filename}).end()
-                return false
-              })
-            ]
-          })
-          return false
-        }).
-        hover(
-          function () {$(this).css({opacity: 1})},
-          function () {$(this).css({opacity: opacity})}
-        )
-    }
-    var box = $('<div>')
-    return render()
-  }
-
-  function save () {
-    var section = $('.tab-pane.active').attr('id')
-    var slides = {}
-    $('.tab-pane.active .thumb').each(function(index, element) {
-      var file = $(element).attr('file')
-      slides[file] = conf[section][file]
-    })
-    conf[section] = slides
-    superagent.post('/admin').send({action: 'save', conf: conf}).end()
-  }
-
   function modal (d) {
     $('<div>').addClass('modal fade').append(
       $('<div>').addClass('modal-dialog modal-lg').append(
@@ -99,22 +20,97 @@ $(function () {
     ).
     modal('show')
   }
+  function thumb (d) {
+    function render (update) {
+      _.extend(d, update)
+      box.empty().off().stop(true).
+        addClass('thumb').
+        css({
+          cursor: 'pointer',
+          float: 'left',
+          width: thumbSize,
+          height: thumbSize,
+          margin: '20px 0 0 20px',
+          'border-radius': 5,
+          border: '1px solid #ccc',
+          'box-shadow': '0px 0px 3px 0px black',
+          'background-size': 'cover',
+          'background-position': 'center',
+          'background-repeat': 'no-repeat',
+          opacity: opacity
+        })
+      if (d.file && !d.photo) {
+        superagent.post('/admin/add').field({type: 'photo', sectionId: d.section.id}).attach('file', d.file).end(function (err, res) {
+          if (res.body && res.body.id)
+            return render({photo: res.body})
+          box.remove()
+        })
+        return box.css({opacity: 1}).effect('pulsate', {times: 10000}, 10000 * 1000)
+      }
+      return box.
+        attr({'data-id': d.photo.id}).
+        css({
+          'background-image': 'url(/photos/' + d.section.name + '/thumbs/' + d.photo.filename + ')',
+          opacity: opacity
+        }).
+        on('click', function () {
+          modal({
+            body: $('<img>').attr('src', '/photos/' +  d.section.name + '/slides/' + d.photo.filename).css({display: 'block', margin: '0 auto'}),
+            footer: [
+              $('<div>').addClass('form-check').css({'margin-right': 'auto'}).append(
+                $('<input>').
+                  attr({type: 'checkbox', id: 'frontpage'}).
+                  addClass('form-check-input').
+                  prop('checked', d.photo.frontpage).
+                  change(function () {
+                    superagent.post('/admin/update').send({type: 'photo', id: d.photo.id, frontpage:+$(this).is(':checked')}).end((err, res) => {
+                      d.photo.frontpage = res.body.frontpage
+                    })
+                  }),
+                $('<label>').attr({for: 'frontpage'}).text('Show on frontpage')
+              ),
+              $('<button>').addClass('btn btn-danger').text('Delete').click(function () {
+                box.fadeOut(function() {
+                  box.remove()
+                })
+                superagent.post('/admin/delete').send({type: 'photo', id: d.photo.id}).end(() => {
+                  d.section.photo.splice(d.section.photo.indexOf(d.photo), 1)
+                })
+                $(this).closest('.modal').modal('hide')
+                return false
+              })
+            ]
+          })
+          return false
+        }).
+        hover(
+          function () {$(this).css({opacity: 1})},
+          function () {$(this).css({opacity: opacity})}
+        )
+    }
+    var box = $('<div>')
+    return render()
+  }
 
-  $('body').append(
+  _.each(config.section, section => {
+    section.photo = _.where(config.photo, {sectionId: section.id})
+  })
+
+  $('body').css({padding: 15}).append(
     $('<ul>').addClass('nav nav-pills').
-      append(_.map(conf, function (photo, section) {
+      append(_.map(config.section, function (section) {
         return $('<li>').append(
           $('<a>').
-            attr({href: '#' + section, 'data-bs-toggle': 'tab'}).
+            attr({href: '#' + section.name, 'data-bs-toggle': 'tab'}).
             addClass('nav-link').
-            text(section.charAt(0).toUpperCase() + section.slice(1)).
+            text(section.name.charAt(0).toUpperCase() + section.name.slice(1)).
             tab()
           )
       })),
     $('<div>').addClass('tab-content').
-      append(_.map(conf, function (photo, section) {
+      append(_.map(config.section, function (section) {
         return $('<div>').
-          attr('id', section).
+          attr('id', section.name).
           addClass('tab-pane fade').
           css({position: 'fixed', top: 60, right: 5, bottom: 0, left: 5}). //for drop
           on('dragover', false).
@@ -134,10 +130,12 @@ $(function () {
                 margin: '20px 0 0 20px',
               })
             },
-            update: save
+            update: function (e, ui) {
+              superagent.post('/admin/update').send({type: 'photo', id: ui.item.attr('data-id'), position: ui.item.index() + 1}).end()
+            }
           }).
-          append(_.map(photo, function (frontpage, filename) {
-            return thumb({section: section, filename: filename})
+          append(_.map(section.photo, function (photo) {
+            return thumb({section: section, photo: photo})
           }))
       }))
   )

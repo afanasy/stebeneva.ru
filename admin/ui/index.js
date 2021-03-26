@@ -24,7 +24,6 @@ $(function () {
     function render (update) {
       _.extend(d, update)
       box.empty().off().stop(true).
-        addClass('thumb').
         css({
           cursor: 'pointer',
           float: 'left',

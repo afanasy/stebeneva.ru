@@ -18,7 +18,7 @@ module.exports = express().
       db.select('photo', {sectionId: data[0], filename: req.params.filename}, 'content', (err, data) => {
         if (!data[0])
           return res.sendStatus(404)
-        res.set('Cache-Control', 'public, max-age=86400')
+        res.set('Cache-Control', 'public, max-age=31536000')
         if (req.params.type == 'thumbs')
           return sharp(data[0]).resize(config.thumbSize, config.thumbSize).pipe(res)
         res.end(data[0])

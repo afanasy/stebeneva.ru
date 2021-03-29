@@ -2,8 +2,8 @@ var _ = window._
 var config = window.config
 var thumbSize = 56
 var slideSize = {
-  width: 675,
-  height: 450
+  width: 840, //675,
+  height: 562
 }
 var opacity = .8
 var duration = 3000
@@ -27,7 +27,8 @@ $(function() {
 
   var margin = 10
   var borderWidth = 1
-  var scrollBoxWidth = 625
+  var scrollBoxWidth = slideSize.width - 50
+  var scrollBoxHeight = thumbSize + 2 * borderWidth
   var thumbWidth = thumbSize + margin + 2 * borderWidth
   var section = _.findWhere(config.section, {name: window.section})
   var slideBox = $('<div>')
@@ -58,13 +59,13 @@ $(function() {
           'background-position': 'center',
           'background-repeat': 'no-repeat',
           opacity: i? 0: 1,
-          transition: 'opacity .3s ease-in-out'
+          transition: 'opacity ' + fadeDuration + 'ms ease-in-out'
         })
       })),
-      $('<div>').append(
-        $('<i>').css({cursor: 'pointer', color: '#aaa', float: 'left', 'font-size': 30, 'line-height': thumbSize + 'px'}).addClass('fas fa-angle-left').click(slide({add: -1})),
-        $('<i>').css({cursor: 'pointer', color: '#aaa', float: 'right', 'font-size': 30, 'line-height': thumbSize + 'px'}).addClass('fas fa-angle-right').click(slide({add: 1})),
-        $('<div>').css({width: scrollBoxWidth, height: thumbSize, margin: '0 auto', overflow: 'hidden'}).append(
+      $('<div>').css({width: slideSize.width}).append(
+        $('<i>').css({cursor: 'pointer', color: '#aaa', float: 'left', 'font-size': 30, 'line-height': scrollBoxHeight + 'px'}).addClass('fas fa-angle-left').click(slide({add: -1})),
+        $('<i>').css({cursor: 'pointer', color: '#aaa', float: 'right', 'font-size': 30, 'line-height': scrollBoxHeight + 'px'}).addClass('fas fa-angle-right').click(slide({add: 1})),
+        $('<div>').css({width: scrollBoxWidth, height: scrollBoxHeight, margin: '0 auto', overflow: 'hidden'}).append(
           thumbBox.css({width: thumbWidth * _.size(section.photo), overflow: 'auto', transition: 'transform ' + fadeDuration + 'ms ease-in-out'}).append(_.map(section.photo, function (photo, i) {
             return $('<div>').css({
               cursor: 'pointer',

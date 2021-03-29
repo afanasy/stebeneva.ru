@@ -3,16 +3,16 @@ html
   head
     title Photographer Stebeneva Mariana
     meta(charset='utf-8')
-    link(href='/res/galleria/galleria.css' rel='stylesheet')
+    link(href='https://use.fontawesome.com/releases/v5.15.3/css/all.css' rel='stylesheet' integrity='sha256-2H3fkXt6FEmrReK448mDVGKb3WW2ZZw35gI7vqHOE4Y=' crossorigin='anonymous')
     link(href='/res/index.css' rel='stylesheet')
     link(href='/res/common.css' rel='stylesheet')
     link(href='/css/default.css' rel='stylesheet')
     link(href='/css/index.css' rel='stylesheet')
-    script(src='/js/jquery.js')
-    script(src='/res/jquery.hotkeys.js')
-    script(src='/res/galleria/jquery.galleria.js')
-    script(src='/res/jquery.scrollimages.js')
-    script(type='text/javascript').
+    script(src='https://cdn.jsdelivr.net/npm/underscore@1.12.1/underscore-min.js' integrity='sha256-MCZpKKzIUs07tvMP9rxRrAMbmWOuO0DX82OdEhL74Ns=' crossorigin='anonymous')
+    script(src='https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js' integrity='sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=' crossorigin='anonymous')
+    script.
+      var config = !{JSON.stringify(config)}
+      var section = '#{section}' 
       var _gaq = _gaq || [];
       _gaq.push(['_setAccount', '#{googleAnalytics}']);
       _gaq.push(['_trackPageview']);

@@ -1,164 +1,88 @@
+var _ = window._
+var config = window.config
+var thumbSize = 56
+var slideSize = {
+  width: 675,
+  height: 450
+}
+var opacity = .8
+var duration = 3000
+var fadeDuration = 1000
+
 $(function() {
+  function slide (d) {
+    return function () {
+      i = (d.add? (i + d.add): d) % _.size(section.photo)
+      $('> div', slideBox).css({opacity: 0}).eq(i).css({opacity: 1})
+      $('> div', thumbBox).css({opacity: opacity}).eq(i).css({opacity: 1})
+      thumbBox.css({transform: 'translate(' + Math.min(scrollBoxWidth - ((i + 1) * thumbWidth), 0) + 'px, 0)'})
+      if (d.clear !== false)
+        clearInterval(slideInterval)
+      return false
+    }
+  }
+  _.each(config.section, section => {
+    section.photo = _.where(config.photo, {sectionId: section.id})
+  })
 
-  var imageWidth = 68;
-  var size = $("#thumbnails_container li").length
-  $("#thumbnails_container").css('width', imageWidth * size)
+  var margin = 10
+  var borderWidth = 1
+  var scrollBoxWidth = 625
+  var thumbWidth = thumbSize + margin + 2 * borderWidth
+  var section = _.findWhere(config.section, {name: window.section})
+  var slideBox = $('<div>')
+  var thumbBox = $('<div>')
+  var slideInterval = setInterval(function () {slide({add: 1, clear: false})()}, duration)  
+  var i = 0
 
-			$("#thumbnails_container").imageScroller({
-				onBeforeScroll: function() { $.galleria.stop() },
-				onScroll: function() { $.galleria.start() }, 
-				duration: 120, 
-				imageWidth: imageWidth, 
-				size: 6,
-				fastSteps: 5
-			});
-			
-			var formattedThumbnailOpacity = 67 / 100;
-			
-			$(".thumbnails_unstyled").addClass("thumbnails");
-
-			$("ul.thumbnails").galleria({
-				history: false,
-				clickNext: true,
-				insert: "#main_image",
-				onImage: function(image, caption, thumb) {
-					var extras = $("#extras").css("display", "none").empty();
-					image.css("display", "none").fadeIn(500);
-					caption.css("display", "none").fadeIn(500);
-					
-					if (false) {
-						var extrasList = $("<ul></ul>");
-						extrasList.addMetadata("Date", thumb.data("originalDate"));
-						extrasList.addMetadata("Camera", thumb.data("cameraModel"));
-						extrasList.addMetadata("Exposure time", thumb.data("exposureTime"));
-						extrasList.addMetadata("ISO", thumb.data("isoEquivalent"));
-						extrasList.addMetadata("Aperture", thumb.data("aperture"));
-						extrasList.addMetadata("Focus distance", thumb.data("focusDistance"));
-						extrasList.addMetadata("Focal length", thumb.data("focalLength35mm"));
-						extrasList.addMetadata("Keywords", thumb.data("keywords"));
-						if (extrasList.children().length > 0) {
-							extras.append(extrasList);						
-							extrasList.find(":first-child").addClass("first");
-							extras.css({ 
-								width : (image.outerWidth() - (5 * 2) + 100) + "px" 
-							}).fadeIn(500);
-						}
-					}
-					
-					var li = thumb.parents("li");
-					li.siblings().children("img.selected").fadeTo(500, formattedThumbnailOpacity);
-					thumb.fadeTo("fast", 1).addClass("selected");
-					image.attr("title", "Next image");
-					
-					var original = thumb.data("original");
-					if (original) {
-						var originalLink = $("<a></a>").attr("href", original).text("Download original");
-						caption.append(" (").append(originalLink).append(")");
-					}
-				},
-				onThumb: function(thumb) {
-					var li = thumb.parents("li");
-					var fadeTo = li.is(".active") ? "1" : formattedThumbnailOpacity;
-					thumb.css({display: "none", opacity: fadeTo}).fadeIn(1500);
-					thumb.hover(
-						function() { 
-							thumb.fadeTo("fast", 1);		
-						},
-						function() {
-							li.not(".active").children("img").fadeTo("fast", formattedThumbnailOpacity);
-						}
-					)
-				},
-				preloads: 6,
-				fastSteps: 5,
-				onPrev: function() {
-					$.imageScroller.scrollLeft();
-				},
-				onNext: function() {
-					$.imageScroller.scrollRight();
-				},
-				onPrevFast: function() {
-					$.imageScroller.fastScrollLeft();
-				},
-				onNextFast: function() {
-					$.imageScroller.fastScrollRight();
-				},
-				enableSlideshow : false,
-				autostartSlideshow : false,
-				slideshowDelay : 3000,
-				onSlideshowPlayed : function() {
-					$('.play').hide();
-					$('.pause').show();	
-				},
-				onSlideshowPaused : function() {
-					$('.play').show();
-					$('.pause').hide();
-				}
-			});
-			
-			$.galleria.loader = $("<div></div>").addClass("loader").append($(new Image()).attr("src","/res/loader.gif").attr("title","Loading..."));
-			
-			prepareArrow = function(arrow) {
-				arrow.css({display: "none", opacity: 0.5}).fadeIn( 1000);			
-				arrow.hover(
-					function() {
-						arrow.fadeTo("fast", 1);
-					},
-					function() {
-						arrow.fadeTo("fast", 0.5);			
-					}
-				);	
-			}
-			
-			var leftArrow = $("#left_arrow");
-			prepareArrow(leftArrow);
-			leftArrow.click(function() {
-				$.galleria.prev();	
-			});
-			
-			var rightArrow = $("#right_arrow");
-			prepareArrow(rightArrow);
-			rightArrow.click(function() {
-				$.galleria.next();
-			});
-			
-			if (false) {
-				var leftFastArrow = $("#left_fast_arrow");
-				prepareArrow(leftFastArrow);
-				leftFastArrow.click(function() {
-					$.galleria.prevFast();
-				});
-				
-				var rightFastArrow = $("#right_fast_arrow");
-				prepareArrow(rightFastArrow);
-				rightFastArrow.click(function() {
-					$.galleria.nextFast();
-				});
-			}
-		});
-
-		$(document).bind("keydown", "left", function() {
-			if (!KeyboardNavigation.widgetHasFocus()) {
-				$.galleria.prev();
-			}
-		});
-		$(document).bind("keydown", "right", function() {
-			if (!KeyboardNavigation.widgetHasFocus()) {
-				$.galleria.next();
-			}
-		});
-		$(document).bind("keydown", "space", function() {
-			if (!KeyboardNavigation.widgetHasFocus()) {
-				$.galleria.toggleSlideshow();
-			}
-		});
-
-		var KeyboardNavigation = {
-			widgetHasFocus: function() {
-				if(typeof _jaWidgetFocus != 'undefined' && _jaWidgetFocus) {
-					return true;
-				}
-				return false;
-			}
-		}
-
+  $('body').
+    keydown(function (e) {
+      if (e.which == 32) //space
+        slide({add: 1})()
+      if (e.which == 37) //left arrow
+        slide({add: -1})()
+      if (e.which == 39) //right arrow
+        slide({add: 1})()
+    })
+  $('.content').
+    append(
+      slideBox.css({position: 'relative', width: slideSize.width, height: slideSize.height, 'margin-bottom': 10}).append(_.map(section.photo, function (photo, i) {
+        return $('<div>').css({
+          position: 'absolute',
+          top: 0,
+          right: 0,
+          bottom: 0,
+          left: 0,
+          'background-image': 'url(/photos/' + section.name + '/slides/' + photo.filename + ')',
+          'background-size': 'cover',
+          'background-position': 'center',
+          'background-repeat': 'no-repeat',
+          opacity: i? 0: 1,
+          transition: 'opacity .3s ease-in-out'
+        })
+      })),
+      $('<div>').append(
+        $('<i>').css({cursor: 'pointer', color: '#aaa', float: 'left', 'font-size': 30, 'line-height': thumbSize + 'px'}).addClass('fas fa-angle-left').click(slide({add: -1})),
+        $('<i>').css({cursor: 'pointer', color: '#aaa', float: 'right', 'font-size': 30, 'line-height': thumbSize + 'px'}).addClass('fas fa-angle-right').click(slide({add: 1})),
+        $('<div>').css({width: scrollBoxWidth, height: thumbSize, margin: '0 auto', overflow: 'hidden'}).append(
+          thumbBox.css({width: thumbWidth * _.size(section.photo), overflow: 'auto', transition: 'transform ' + fadeDuration + 'ms ease-in-out'}).append(_.map(section.photo, function (photo, i) {
+            return $('<div>').css({
+              cursor: 'pointer',
+              float: 'left',
+              width: thumbSize,
+              height: thumbSize,
+              'margin-right': 10,
+              border: borderWidth + 'px solid #ccc',
+              'background-image': 'url(/photos/' + section.name + '/thumbs/' + photo.filename + ')',
+              'background-size': 'cover',
+              'background-position': 'center',
+              'background-repeat': 'no-repeat',
+              opacity: i? opacity: 1,
+              transition: 'opacity ' + fadeDuration + 'ms ease-in-out'
+            }).
+            click(slide(i))
+          }))
+        )
+      )
+    )
+})

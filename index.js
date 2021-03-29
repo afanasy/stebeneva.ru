@@ -5,6 +5,7 @@ var packageName = require('./package').name
 var config = _.extend(require('./config'), require(__dirname + '/../.' + packageName))
 var db = require('./db')
 var adminRouter = require('./admin/router')
+var photoField = ['id', 'created', 'sectionId', 'filename', 'content', 'frontpage', 'position']
 
 module.exports = express().
   set('views', __dirname + '/views').
@@ -32,6 +33,16 @@ module.exports = express().
           conf: config.section,
           googleAnalytics: config.googleAnalytics
         }
+        next()
+      })
+    })
+  }).
+  use((req, res, next) => {
+    res.locals.config = {}
+    db.select('section', (err, data) => {
+      res.locals.config.section = data
+      db.select('photo', {}, _.without(photoField, 'content'), (err, data) => {
+        res.locals.config.photo = _.sortBy(data, 'position')
         next()
       })
     })

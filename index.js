@@ -11,33 +11,8 @@ module.exports = express().
   set('views', __dirname + '/views').
   set('view engine', 'pug').
   use(express.static(__dirname + '/public')).//, {maxAge: '1 day'})).
-  get('/photos/:name/:type/:filename', (req, res) => {
-    db.select('section', {name: req.params.name}, 'id', (err, data) => {
-      if (!data[0])
-        return res.sendStatus(404)
-      db.select('photo', {sectionId: data[0], filename: req.params.filename}, 'content', (err, data) => {
-        if (!data[0])
-          return res.sendStatus(404)
-        res.set('Cache-Control', 'public, max-age=31536000')
-        if (req.params.type == 'thumbs')
-          return sharp(data[0]).resize(config.thumbSize, config.thumbSize).pipe(res)
-        res.end(data[0])
-      })
-    })
-  }).
   use((req, res, next) => {
-    db.select('section', {}, ['id', 'name'], (err, section) => {
-      db.select('photo', {}, ['id', 'sectionId', 'filename', 'frontpage', 'position'], (err, photo) => {
-        config.section = _.object(_.map(section, d => [d.name, _.object(_.map(_.sortBy(_.where(photo, {sectionId: d.id}), d => +d.position), d => [d.filename, !!d.frontpage]))])),
-        res.locals = {
-          conf: config.section,
-          googleAnalytics: config.googleAnalytics
-        }
-        next()
-      })
-    })
-  }).
-  use((req, res, next) => {
+    res.locals.googleAnalytics = config.googleAnalytics
     res.locals.config = {}
     db.select('section', (err, data) => {
       res.locals.config.section = data
@@ -47,13 +22,24 @@ module.exports = express().
       })
     })
   }).
-  get('/', (req, res) => {
-    res.render('index')
+  use('/admin', adminRouter).
+  get('/photo/:id/:type', (req, res) => {
+    db.select('photo', +req.params.id, 'content', (err, content) => {
+      if (!content)
+        return res.sendStatus(404)
+      res.set('Cache-Control', 'public, max-age=31536000')
+      if (req.params.type == 'thumb')
+        return sharp(content).resize(config.thumbSize, config.thumbSize).pipe(res)
+      res.end(content)
+    })
   }).
-  get('/photo/:section', (req, res) => {
-    res.render('photo', {section: req.params.section})
-  }).
-  get('/contact', (req, res) => {
-    res.render('contact')
-  }).
-  use('/admin', adminRouter)
+  get(
+    [
+      '/',
+      '/photo/:section',
+      '/contact'
+    ], 
+    (req, res) => {
+      res.render('index')
+    }
+  )

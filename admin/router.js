@@ -1,5 +1,5 @@
 var _ = require('underscore')
-var async = require('async')
+//var async = require('async')
 var express = require('express')
 var bodyParser = require('body-parser')
 var sharp = require('sharp')

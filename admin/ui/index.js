@@ -49,12 +49,12 @@ $(function () {
       return box.
         attr({'data-id': d.photo.id}).
         css({
-          'background-image': 'url(/photos/' + d.section.name + '/thumbs/' + d.photo.filename + ')',
+          'background-image': 'url(/photo/' + d.photo.id + '/thumb)',
           opacity: opacity
         }).
         on('click', function () {
           modal({
-            body: $('<img>').attr('src', '/photos/' +  d.section.name + '/slides/' + d.photo.filename).css({display: 'block', margin: '0 auto'}),
+            body: $('<img>').attr('src', '/photo/' + d.photo.id + '/slide').css({display: 'block', margin: '0 auto'}),
             footer: [
               $('<div>').addClass('form-check').css({'margin-right': 'auto'}).append(
                 $('<input>').

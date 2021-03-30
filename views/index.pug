@@ -1,3 +1,49 @@
-extends layout
-block content
-  script(src='/js/index.js')
+doctype html
+html
+  head
+    title Photographer Stebeneva Mariana
+    meta(charset='utf-8')
+    link(href='https://use.fontawesome.com/releases/v5.15.3/css/all.css' rel='stylesheet' integrity='sha256-2H3fkXt6FEmrReK448mDVGKb3WW2ZZw35gI7vqHOE4Y=' crossorigin='anonymous')
+    link(href='/css/index.css' rel='stylesheet')
+    script(src='https://cdn.jsdelivr.net/npm/underscore@1.12.1/underscore-min.js' integrity='sha256-MCZpKKzIUs07tvMP9rxRrAMbmWOuO0DX82OdEhL74Ns=' crossorigin='anonymous')
+    script(src='https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js' integrity='sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=' crossorigin='anonymous')
+    script.
+      var config = !{JSON.stringify(config)}
+      var section = '#{section}' 
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', '#{googleAnalytics}']);
+      _gaq.push(['_trackPageview']);
+      (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+      })();
+    script(src='/js/index.js')
+  body
+    #contact.hide
+      p
+        | Stebeneva Mariana 
+        br
+        | Saint-Petersburg, Russia, Whatsapp +7 9046464542
+        br
+        | Israel, +972 546594259
+      div
+        a(href='mailto:stebeneva.maryana@gmail.com') stebeneva.maryana@gmail.com
+      div
+        a(href='https://facebook.com/stebeneva', target='_blank') facebook.com/stebeneva
+      div
+        a(href='https://vk.com/stebeneva', target='_blank') vk.com/stebeneva
+    .container
+      .head
+        a(href='/') Mariana Stebeneva
+      .nav
+        .left
+          ul
+            each section in config.section
+              li
+                a(href='/photo/' + section.name) #{section.name}
+        .right
+          ul
+            li
+              a.contact(href='/contact') contact
+      .content

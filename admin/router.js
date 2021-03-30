@@ -8,8 +8,8 @@ var fs = require('fs')
 var uniqid = require('uniqid')
 var packageName = require('../package').name
 var config = _.extend(require('../config'), require(__dirname + '/../../.' + packageName))
-var photoField = ['id', 'created', 'sectionId', 'filename', 'content', 'frontpage', 'position']
 var db = require('../db')
+var loadConfig = require('../loadConfig')
 
 module.exports = express.Router().
   use(bodyParser.json()).
@@ -27,38 +27,32 @@ module.exports = express.Router().
       }
     }).any()
   ).
-  use((req, res, next) => {
-    res.locals.config = {}
-    db.select('section', (err, data) => {
-      res.locals.config.section = data
-      db.select('photo', {}, _.without(photoField, 'content'), (err, data) => {
-        res.locals.config.photo = _.sortBy(data, 'position')
-        next()
-      })
-    })
-  }).
   get('/', (req, res) => {
-    res.render(__dirname + '/index')
+    loadConfig((err, data) => {
+      res.render(__dirname + '/index', {config: data})
+    })
   }).
   post('/add', (req, res) => {
     var file = _.findWhere(req.files, {fieldname: 'file'})
     var filename = 'auto' + uniqid() + '.png'
-    db.insert('photo', {created: {now: true}, sectionId: req.body.sectionId, filename: filename, position: _.size(_.where(res.locals.config.photo, {sectionId: +req.body.sectionId})) + 1}, (err, data) => {
-      var photo = {id: data.insertId}
-      var tmp = '/var/lib/mysql-files/stebeneva.ru/' + filename
-      sharp(file.path).
-        resize(config.slideSize.width, config.slideSize.height).
-        toFile(tmp, () => {
-          db.query('update ?? set ?? = load_file(?) where ?', ['photo', 'content', tmp, {id: photo.id}], () => {
-            fs.unlink(file.path, () => {
-              fs.unlink(tmp, () => {
-                db.select('photo', photo.id, ['id', 'created', 'sectionId', 'filename', 'frontpage', 'position'], (err, data) => {
-                  res.json(_.extend({type: 'photo'}, data))
+    db.count('photo', {sectionId: req.body.sectionId}, (err, count) => {
+      db.insert('photo', {created: {now: true}, sectionId: req.body.sectionId, filename: filename, position: count + 1}, (err, data) => {
+        var photo = {id: data.insertId}
+        var tmp = '/var/lib/mysql-files/stebeneva.ru/' + filename
+        sharp(file.path).
+          resize(config.slideSize.width, config.slideSize.height).
+          toFile(tmp, () => {
+            db.query('update ?? set ?? = load_file(?) where ?', ['photo', 'content', tmp, {id: photo.id}], () => {
+              fs.unlink(file.path, () => {
+                fs.unlink(tmp, () => {
+                  db.select('photo', photo.id, ['id', 'created', 'sectionId', 'filename', 'frontpage', 'position'], (err, data) => {
+                    res.json(_.extend({type: 'photo'}, data))
+                  })
                 })
               })
             })
           })
-        })
+      })
     })
   }).
   post('/update', (req, res) => {
@@ -74,7 +68,7 @@ module.exports = express.Router().
       })
     }
     updatePosition(req.body, () => {
-      db.update('photo', +req.body.id, _.pick(req.body, _.without(photoField, ['id', 'content'])), () => {
+      db.update('photo', +req.body.id, _.pick(req.body, _.without(loadConfig.photoField, ['id', 'content'])), () => {
         res.json({})
       })
     })

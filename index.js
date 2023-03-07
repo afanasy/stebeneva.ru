@@ -57,7 +57,7 @@ module.exports = express().
     ], 
     (req, res) => {
       loadConfig((err, data) => {
-        if (!req.headers['if-none-match'])
+        if (res.push && !req.headers['if-none-match'])
           _.each(data.photo, photo => {
             res.push('/photo/' + photo.id + '/thumb', {response: {'Cache-Control': cacheControl}}, (err, stream) => {
               if (stream)
